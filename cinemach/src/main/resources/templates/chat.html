@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CineMatch - Chat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="navbar">
+    <h1 class="logo">CineMatch</h1>
+    <nav>
+      <a href="pesquisa.html" class="nav-btn">🔎</a>
+      <a href="chat.html" class="nav-btn">💬</a>
+      <a href="curtidos.html" class="nav-btn">❤️</a>
+      <a href="perfil.html" class="nav-btn">👤</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="chat-section">
+      <h2>Chat 💬</h2>
+
+      <div class="chat-container">
+        <div id="chat-messages" class="chat-messages"></div>
+
+        <form id="chat-form" class="chat-form">
+          <input id="chat-input" type="text" placeholder="Escreva uma mensagem..." autocomplete="off" />
+          <button type="submit" class="btn-curti">Enviar</button>
+          <button type="button" id="chat-clear" class="btn-nao">Limpar</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

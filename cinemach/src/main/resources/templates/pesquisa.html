@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CineMatch - Pesquisa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+          background-color: #111;
+          color: white;
+          margin: 0;
+          font-family: Arial, sans-serif;
+        }
+
+        header {
+          background-color: #000;
+          padding: 15px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        header h1 {
+          color: #c700ff;
+          margin: 0;
+        }
+
+        nav a {
+          color: white;
+          margin-left: 15px;
+          text-decoration: none;
+          font-size: 18px;
+        }
+
+        main {
+          padding: 20px;
+        }
+
+        h2 {
+          text-align: center;
+          color: #c700ff;
+        }
+
+        /* Campo de pesquisa */
+        .barra-pesquisa {
+          display: flex;
+          justify-content: center;
+          margin: 20px 0;
+        }
+
+        .barra-pesquisa input {
+          padding: 10px;
+          width: 300px;
+          border-radius: 8px 0 0 8px;
+          border: none;
+          font-size: 16px;
+        }
+
+        .barra-pesquisa button {
+          padding: 10px 20px;
+          border: none;
+          border-radius: 0 8px 8px 0;
+          background-color: #c700ff;
+          color: white;
+          font-weight: bold;
+          cursor: pointer;
+        }
+
+        .barra-pesquisa button:hover {
+          background-color: #a000cc;
+        }
+
+        /* Catálogo */
+        .catalogo {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 25px;
+          margin-top: 20px;
+        }
+
+        /* Card */
+        .card {
+          background: #1a1a1a;
+          padding: 15px;
+          border-radius: 12px;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          align-items: center;
+          text-align: center;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          width: 380px;
+          height: 580px;
+        }
+
+        .card:hover {
+          transform: translateY(-8px) scale(1.03);
+          box-shadow: 0 8px 20px rgba(214, 51, 255, 0.6);
+        }
+
+        .card img {
+          width: 100%;
+          height: 300px;
+          object-fit: contain;
+          background: #000;
+          border-radius: 8px;
+        }
+
+        .card h3 {
+          margin: 10px 0 5px;
+          font-size: 18px;
+          color: #c700ff;
+        }
+
+        .card p {
+          margin: 4px 0;
+        }
+
+        .descricao {
+          font-size: 14px;
+          color: #ccc;
+          margin: 8px 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 4;
+          -webkit-box-orient: vertical;
+          word-wrap: break-word;
+        }
+
+        .nota {
+          font-size: 14px;
+          font-weight: bold;
+          color: #ffcc00;
+          margin: 8px 0;
+        }
+
+        .nota i {
+          margin-right: 5px;
+        }
+
+        .botoes {
+          display: flex;
+          justify-content: center;
+          gap: 12px;
+          margin-top: auto;
+        }
+
+        .btn-like, .btn-dislike {
+          padding: 8px 14px;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          transition: transform 0.2s ease, background 0.3s ease;
+          font-weight: bold;
+        }
+
+        .btn-like {
+          background: linear-gradient(135deg, #28a745, #34d058);
+          color: white;
+        }
+
+        .btn-like:hover {
+          transform: scale(1.1);
+          background: #218838;
+        }
+
+        .btn-dislike {
+          background: linear-gradient(135deg, #dc3545, #ff4d6d);
+          color: white;
+        }
+
+        .btn-dislike:hover {
+          transform: scale(1.1);
+          background: #c82333;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>CineMatch</h1>
+    <nav>
+        <a href="/"><i class="fa-solid fa-house"></i></a>
+        <a href="/pesquisa"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="/chat"><i class="fa-solid fa-comment"></i></a>
+        <a href="/favoritos"><i class="fa-solid fa-heart"></i></a>
+        <a href="/perfil"><i class="fa-solid fa-user"></i></a>
+    </nav>
+</header>
+
+<main>
+    <h2>Pesquisar Filmes 🔎</h2>
+
+    <form class="barra-pesquisa" method="get" action="/pesquisa">
+        <input type="text" name="q" placeholder="Digite o nome do filme..." th:value="${query}">
+        <button type="submit">Buscar</button>
+    </form>
+
+    <section class="catalogo">
+        <div th:each="filme : ${filmes}" class="card">
+            <img th:src="${filme.imagem}" alt="Poster do filme">
+            <h3 th:text="${filme.titulo}"></h3>
+            <p th:text="${filme.genero}"></p>
+            <p class="descricao" th:text="${filme.descricao}"></p>
+            <div class="nota"><i class="fa-solid fa-star"></i> <span th:text="${filme.nota}"></span></div>
+            <div class="botoes">
+                <button class="btn-like"><i class="fa-solid fa-thumbs-up"></i> Curtir</button>
+                <button class="btn-dislike"><i class="fa-solid fa-thumbs-down"></i> Não curtir</button>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

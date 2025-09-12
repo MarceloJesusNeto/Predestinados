@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CineMatch - Perfil</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="navbar">
+    <h1 class="logo">CineMatch</h1>
+    <nav>
+      <a href="pesquisa.html" class="nav-btn">🔎</a>
+      <a href="chat.html" class="nav-btn">💬</a>
+      <a href="curtidos.html" class="nav-btn">❤️</a>
+      <a href="perfil.html" class="nav-btn">👤</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="perfil-section">
+      <h2>Meu Perfil 👤</h2>
+
+      <form id="profile-form" class="profile-form">
+        <input id="perfil-name" type="text" placeholder="Nome" />
+        <input id="perfil-email" type="email" placeholder="E-mail" />
+        <input id="perfil-phone" type="text" placeholder="Telefone" />
+        <div style="display:flex; gap:10px;">
+          <button type="submit" class="btn-curti">Salvar</button>
+          <button type="button" id="perfil-reset" class="btn-nao">Limpar</button>
+        </div>
+        <div id="perfil-saved" class="muted"></div>
+      </form>
+
+      <div class="perfil-exibir">
+        <h3>Dados salvos</h3>
+        <p><strong>Nome:</strong> <span id="exibe-nome">—</span></p>
+        <p><strong>E-mail:</strong> <span id="exibe-email">—</span></p>
+        <p><strong>Telefone:</strong> <span id="exibe-phone">—</span></p>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
