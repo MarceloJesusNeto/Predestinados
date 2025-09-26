@@ -59,7 +59,7 @@ public class ImdbService {
         }
     }
 
-    // 🎲 Busca filmes aleatórios (também já trazendo detalhes)
+
     public List<Filme> buscarFilmesAleatorios() {
         List<Filme> filmes = new ArrayList<>();
         try {
@@ -92,7 +92,7 @@ public class ImdbService {
         return filmes;
     }
 
-    // 📄 Buscar detalhes completos (usado no botão)
+
     public Filme buscarDetalhes(String imdbId) {
         try {
             String detalheStr = restTemplate.getForObject(DETAIL_URL + imdbId, String.class);
