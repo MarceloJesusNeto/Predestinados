@@ -42,7 +42,6 @@
           color: #c700ff;
         }
 
-        /* CATÁLOGO */
         .catalogo {
           display: flex;
           flex-wrap: wrap;
@@ -51,7 +50,6 @@
           margin-top: 20px;
         }
 
-        /* CARD */
         .card {
           background: #1a1a1a;
           padding: 15px;
@@ -59,12 +57,12 @@
           box-shadow: 0 4px 8px rgba(0,0,0,0.6);
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
+          justify-content: flex-start;
           align-items: center;
           text-align: center;
           transition: transform 0.3s ease, box-shadow 0.3s ease;
-          width: 380px;   /* largura maior */
-          height: 580px;  /* altura fixa */
+          width: 320px;
+          min-height: 520px;
         }
 
         .card:hover {
@@ -74,9 +72,9 @@
 
         .card img {
           width: 100%;
-          height: 300px;
-          object-fit: contain;  /* mostra a imagem inteira */
-          background: #000;     /* fundo preto atrás da imagem */
+          height: 280px;
+          object-fit: contain;
+          background: #000;
           border-radius: 8px;
         }
 
@@ -90,32 +88,6 @@
           margin: 4px 0;
         }
 
-        /* DESCRIÇÃO LIMITADA */
-        .descricao {
-          font-size: 14px;
-          color: #ccc;
-          margin: 8px 0;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          display: -webkit-box;
-          -webkit-line-clamp: 4;
-          -webkit-box-orient: vertical;
-          word-wrap: break-word;
-        }
-        .btn-mais {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #ff9800;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: background 0.3s ease;
-        }
-
-        .btn-mais:hover {
-            background-color: #e68900;
-        }
         .nota {
           font-size: 14px;
           font-weight: bold;
@@ -127,32 +99,105 @@
           margin-right: 5px;
         }
 
-        /* BOTÕES */
+.detalhes-box {
+  background: #222;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 8px;
+  color: #ccc;
+  font-size: 14px;
+  text-align: justify;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+.detalhes-box.visible {
+  max-height: 500px;
+  opacity: 1;
+}
+
+.btn-detalhes {
+  background: #6a5acd;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: transform 0.2s ease, background 0.3s;
+}
+
+.btn-detalhes:hover {
+  background: #836fff;
+  transform: scale(1.05);
+}
+
+
+
+        /* Descrição */
+        .descricao {
+          font-size: 14px;
+          color: #ccc;
+          margin: 8px 0;
+          line-height: 1.4em;
+          display: none; /* começa escondida */
+        }
+
+        .btn-descricao {
+          background-color: #6c63ff;
+          color: white;
+          border: none;
+          padding: 6px 12px;
+          margin-top: 8px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 14px;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          transition: background 0.3s ease;
+        }
+
+        .btn-descricao:hover {
+          background-color: #574fd6;
+        }
+
         .botoes {
           display: flex;
           justify-content: center;
           gap: 12px;
           margin-top: auto;
         }
-        .paginacao {
-    text-align: center;
-    margin-top: 20px;
+.generos {
+  margin: 6px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
 }
 
-.btn-mais {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #ff9800;
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: bold;
-    transition: background 0.3s ease;
+.tag-genero {
+  background: #333;
+  color: #ddd;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
 }
 
-.btn-mais:hover {
-    background-color: #e68900;
+.nota {
+  font-size: 15px;
+  font-weight: bold;
+  color: #ffcc00;
+  margin: 6px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
+
+
 
         .btn-like, .btn-dislike {
           padding: 8px 14px;
@@ -166,25 +211,7 @@
           transition: transform 0.2s ease, background 0.3s ease;
           font-weight: bold;
         }
-.paginacao {
-  text-align: center;
-  margin: 30px 0;
-}
 
-.btn-mais {
-  padding: 12px 24px;
-  background: #ff9800;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.btn-mais:hover {
-  background: #e68900;
-}
         .btn-like {
           background: linear-gradient(135deg, #28a745, #34d058);
           color: white;
@@ -213,7 +240,7 @@
         <a href="/"><i class="fa-solid fa-house"></i></a>
         <a href="/pesquisa"><i class="fa-solid fa-magnifying-glass"></i></a>
         <a href="/chat"><i class="fa-solid fa-comment"></i></a>
-        <a href="/favoritos"><i class="fa-solid fa-heart"></i></a>
+        <a href="/curtidos"><i class="fa-solid fa-heart"></i></a>
         <a href="/perfil"><i class="fa-solid fa-user"></i></a>
     </nav>
 </header>
@@ -223,119 +250,68 @@
 
     <section class="catalogo" id="catalogo">
         <div th:each="filme : ${filmes}" class="card">
-            <img th:src="${filme.imagem}" alt="Poster do filme">
+            <img th:src="${filme.imagem}" alt="Poster do filme" loading="lazy">
+            <!-- TÍTULO -->
             <h3 th:text="${filme.titulo}"></h3>
-            <p th:text="${filme.genero}"></p>
-            <p class="descricao" th:text="${filme.descricao}"></p>
-            <div class="nota"><i class="fa-solid fa-star"></i> <span th:text="${filme.nota}"></span></div>
+
+            <!-- Gênero -->
+            <p th:attr="id='genero-' + ${filme.imdbId}" style="display:none;"></p>
+
+            <!-- Nota -->
+            <p th:attr="id='nota-' + ${filme.imdbId}" style="display:none;"></p>
+
+            <!-- DETALHES (descrição escondida) -->
+            <div th:attr="id='detalhes-' + ${filme.imdbId}" class="detalhes-box">
+                <p th:attr="id='descricao-' + ${filme.imdbId}"></p>
+            </div>
+
+            <!-- BOTÃO -->
+            <button class="btn-detalhes"
+                    th:attr="onclick='mostrarDetalhes(' + '\'' + ${filme.imdbId} + '\'' + ', this)'">
+                <i class="fa-solid fa-circle-info"></i> Mostrar detalhes
+            </button>
+
             <div class="botoes">
                 <button class="btn-like"><i class="fa-solid fa-thumbs-up"></i> Curtir</button>
                 <button class="btn-dislike"><i class="fa-solid fa-thumbs-down"></i> Não curtir</button>
             </div>
         </div>
     </section>
-
 </main>
+
 <script>
-    let offset = 16;
-const limit = 16;
+    function mostrarDetalhes(imdbId, botao) {
+    const box = document.getElementById("detalhes-" + imdbId);
+    const descEl = document.getElementById("descricao-" + imdbId);
 
-document.getElementById("btn-mais").addEventListener("click", () => {
-    const btnMais = document.getElementById("btn-mais");
-    const skeletons = document.getElementById("skeletons");
-
-    // mostra skeletons
-    skeletons.innerHTML = "";
-    for (let i = 0; i < limit; i++) {
-        skeletons.innerHTML += `
-            <div class="card skeleton">
-                <div class="skeleton-img"></div>
-                <div class="skeleton-text"></div>
-                <div class="skeleton-text short"></div>
-            </div>
-        `;
+    if (box.classList.contains("visible")) {
+        // Esconder
+        box.classList.remove("visible");
+        botao.innerHTML = '<i class="fa-solid fa-circle-info"></i> Mostrar detalhes';
+        return;
     }
-    skeletons.classList.remove("hidden");
 
-    fetch(`/mais?offset=${offset}&limit=${limit}`)
-        .then(res => res.json())
-        .then(filmes => {
-            const catalogo = document.getElementById("catalogo");
+    // Se já carregou antes, só mostrar
+    if (descEl.innerText && descEl.innerText !== "Carregando...") {
+        box.classList.add("visible");
+        botao.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Ocultar detalhes';
+        return;
+    }
 
-            filmes.forEach(filme => {
-                const card = document.createElement("div");
-                card.classList.add("card");
-                card.innerHTML = `
-                    <img src="${filme.imagem}" alt="Poster do filme">
-                    <h3>${filme.titulo}</h3>
-                    <p>${filme.genero}</p>
-                    <p class="descricao">${filme.descricao}</p>
-                    <div class="nota"><i class="fa-solid fa-star"></i> ${filme.nota}</div>
-                    <div class="acoes">
-                        <button class="curtir"><i class="fa-solid fa-thumbs-up"></i></button>
-                        <button class="nao-curtir"><i class="fa-solid fa-thumbs-down"></i></button>
-                    </div>
-                `;
-                catalogo.appendChild(card);
-            });
+    // Carregar descrição do backend
+    descEl.innerText = "Carregando...";
 
-            offset += filmes.length;
-
-            if (filmes.length < limit) {
-                btnMais.style.display = "none"; // só some quando não tiver mais
-            }
-
-            // esconde skeleton
-            skeletons.classList.add("hidden");
-        })
-        .catch(() => {
-            skeletons.classList.add("hidden");
-        });
-});
-let offset = 16;
-const limit = 16;
-
-document.getElementById("btn-mais").addEventListener("click", () => {
-    const btn = document.getElementById("btn-mais");
-    btn.disabled = true;
-    btn.textContent = "Carregando...";
-
-    fetch(`/mais?offset=${offset}&limit=${limit}`)
-        .then(res => res.json())
-        .then(filmes => {
-            const catalogo = document.getElementById("catalogo");
-
-            filmes.forEach(filme => {
-                const card = document.createElement("div");
-                card.classList.add("card");
-                card.innerHTML = `
-                    <img src="${filme.imagem}" alt="Poster do filme">
-                    <h3>${filme.titulo}</h3>
-                    <p>${filme.genero}</p>
-                    <p class="descricao">${filme.descricao}</p>
-                    <div class="nota"><i class="fa-solid fa-star"></i> ${filme.nota}</div>
-                    <div class="botoes">
-                        <button class="btn-like"><i class="fa-solid fa-thumbs-up"></i> Curtir</button>
-                        <button class="btn-dislike"><i class="fa-solid fa-thumbs-down"></i> Não curtir</button>
-                    </div>
-                `;
-                catalogo.appendChild(card);
-            });
-
-            offset += filmes.length;
-
-            if (filmes.length < limit) {
-                btn.style.display = "none"; // só some quando não houver mais
-            } else {
-                btn.disabled = false;
-                btn.textContent = "Carregar mais";
-            }
-        })
-        .catch(() => {
-            btn.disabled = false;
-            btn.textContent = "Carregar mais";
-        });
-});
+    fetch("/detalhes/" + imdbId)
+    .then(r => r.json())
+    .then(filme => {
+        descEl.innerText = filme.descricao || "Descrição não encontrada.";
+        box.classList.add("visible");
+        botao.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Ocultar detalhes';
+    })
+    .catch(() => {
+        descEl.innerText = "Erro ao carregar detalhes.";
+    });
+}
 </script>
 </body>
 </html>

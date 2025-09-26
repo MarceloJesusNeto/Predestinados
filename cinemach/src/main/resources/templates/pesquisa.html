@@ -115,6 +115,25 @@
           color: #c700ff;
         }
 
+        .detalhes-box {
+  background: #222;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 8px;
+  color: #ccc;
+  font-size: 14px;
+  text-align: justify;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+.detalhes-box.visible {
+  max-height: 500px; /* suficiente para o conteúdo */
+  opacity: 1;
+}
+
         .card p {
           margin: 4px 0;
         }
@@ -148,6 +167,45 @@
           gap: 12px;
           margin-top: auto;
         }
+
+        .like-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 12px;
+            font-size: 22px;
+            color: #aaa;
+            cursor: pointer;
+            transition: transform 0.2s ease, color 0.3s ease;
+        }
+
+        .like-btn:hover {
+            transform: scale(1.2);
+            color: #ff4d4d;
+        }
+
+        .like-btn.liked {
+            color: #ff4d4d;
+        }
+
+        .filme-card {
+            position: relative; /* necessário pro coração ficar dentro do card */
+        }
+
+.btn-detalhes {
+  background: #6a5acd;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: transform 0.2s ease, background 0.3s;
+}
+
+.btn-detalhes:hover {
+  background: #836fff;
+  transform: scale(1.05);
+}
 
         .btn-like, .btn-dislike {
           padding: 8px 14px;
@@ -190,7 +248,7 @@
         <a href="/"><i class="fa-solid fa-house"></i></a>
         <a href="/pesquisa"><i class="fa-solid fa-magnifying-glass"></i></a>
         <a href="/chat"><i class="fa-solid fa-comment"></i></a>
-        <a href="/favoritos"><i class="fa-solid fa-heart"></i></a>
+        <a href="/curtidos"><i class="fa-solid fa-heart"></i></a>
         <a href="/perfil"><i class="fa-solid fa-user"></i></a>
     </nav>
 </header>
@@ -203,13 +261,29 @@
         <button type="submit">Buscar</button>
     </form>
 
-    <section class="catalogo">
+    <section class="catalogo" id="catalogo">
         <div th:each="filme : ${filmes}" class="card">
-            <img th:src="${filme.imagem}" alt="Poster do filme">
+            <img th:src="${filme.imagem}" alt="Poster do filme" loading="lazy">
+            <!-- TÍTULO -->
             <h3 th:text="${filme.titulo}"></h3>
-            <p th:text="${filme.genero}"></p>
-            <p class="descricao" th:text="${filme.descricao}"></p>
-            <div class="nota"><i class="fa-solid fa-star"></i> <span th:text="${filme.nota}"></span></div>
+
+            <!-- Gênero -->
+            <p th:attr="id='genero-' + ${filme.imdbId}" style="display:none;"></p>
+
+            <!-- Nota -->
+            <p th:attr="id='nota-' + ${filme.imdbId}" style="display:none;"></p>
+
+            <!-- DETALHES (descrição escondida) -->
+            <div th:attr="id='detalhes-' + ${filme.imdbId}" class="detalhes-box">
+                <p th:attr="id='descricao-' + ${filme.imdbId}"></p>
+            </div>
+
+            <!-- BOTÃO -->
+            <button class="btn-detalhes"
+                    th:attr="onclick='mostrarDetalhes(' + '\'' + ${filme.imdbId} + '\'' + ', this)'">
+                <i class="fa-solid fa-circle-info"></i> Mostrar detalhes
+            </button>
+
             <div class="botoes">
                 <button class="btn-like"><i class="fa-solid fa-thumbs-up"></i> Curtir</button>
                 <button class="btn-dislike"><i class="fa-solid fa-thumbs-down"></i> Não curtir</button>
@@ -217,5 +291,51 @@
         </div>
     </section>
 </main>
+
+<script>
+    function mostrarDetalhes(imdbId, botao) {
+        const box = document.getElementById("detalhes-" + imdbId);
+        const descEl = document.getElementById("descricao-" + imdbId);
+        const generoEl = document.getElementById("genero-" + imdbId);
+        const notaEl = document.getElementById("nota-" + imdbId);
+
+        if (box.classList.contains("visible")) {
+            // Esconder
+            box.classList.remove("visible");
+            botao.innerHTML = '<i class="fa-solid fa-circle-info"></i> Mostrar detalhes';
+            return;
+        }
+
+        // Se já carregou antes, só mostrar
+        if (descEl.innerText && descEl.innerText !== "Carregando...") {
+            box.classList.add("visible");
+            botao.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Ocultar detalhes';
+            return;
+        }
+
+        // Carregar dados do backend
+        descEl.innerText = "Carregando...";
+        generoEl.innerText = "Carregando...";
+        notaEl.innerText = "⭐ ...";
+
+        fetch("/detalhes/" + imdbId)
+        .then(r => r.json())
+        .then(filme => {
+            descEl.innerText = filme.descricao || "Descrição não encontrada.";
+
+            generoEl.innerText = filme.genero || "Desconhecido";
+            generoEl.style.display = "block";
+
+            notaEl.innerText = "⭐ " + (filme.nota || "N/A");
+            notaEl.style.display = "block";
+
+            box.classList.add("visible");
+            botao.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Ocultar detalhes';
+        })
+        .catch(() => {
+            descEl.innerText = "Erro ao carregar detalhes.";
+        });
+    }
+</script>
 </body>
 </html>

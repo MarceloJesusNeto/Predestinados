@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -20,6 +21,21 @@ public class HomeController {
         this.imdbService = imdbService;
     }
 
+    @GetMapping("/chat")
+    public String chat(){
+        return "chat";
+    }
+
+    @GetMapping("/curtidos")
+    public String fav(){
+        return "curtidos";
+    }
+
+    @GetMapping("/perfil")
+    public String perfil(){
+        return "perfil";
+    }
+
     @GetMapping("/pesquisa")
     public String pesquisa(@RequestParam(required = false) String q, Model model) {
         List<Filme> filmes;
@@ -27,18 +43,17 @@ public class HomeController {
         if (q != null && !q.isBlank()) {
             filmes = imdbService.buscarPorTitulo(q);
         } else {
-            filmes = List.of(); // lista vazia quando não pesquisou nada
+            filmes = List.of();
         }
 
         model.addAttribute("filmes", filmes);
         model.addAttribute("query", q);
 
-        return "pesquisa"; // pesquisa.html
+        return "pesquisa";
     }
 
     @GetMapping("/")
     public String home(Model model, HttpSession session) {
-        // busca só uma vez
         List<Filme> todosFilmes = imdbService.buscarFilmesAleatorios();
         session.setAttribute("filmesCache", todosFilmes);
 
@@ -52,25 +67,10 @@ public class HomeController {
         return "home";
     }
 
-    @GetMapping("/mais")
+    @GetMapping("/detalhes/{imdbId}")
     @ResponseBody
-    public List<Filme> mais(@RequestParam int offset,
-                            @RequestParam int limit,
-                            HttpSession session) {
-
-        @SuppressWarnings("unchecked")
-        List<Filme> todosFilmes = (List<Filme>) session.getAttribute("filmesCache");
-
-        if (todosFilmes == null) {
-            todosFilmes = imdbService.buscarFilmesAleatorios();
-            session.setAttribute("filmesCache", todosFilmes);
-        }
-
-        int fim = Math.min(offset + limit, todosFilmes.size());
-        if (offset >= todosFilmes.size()) {
-            return List.of(); // acabou
-        }
-
-        return todosFilmes.subList(offset, fim);
+    public Filme getDetalhes(@PathVariable String imdbId) {
+        return imdbService.buscarDetalhes(imdbId);
     }
+
 }

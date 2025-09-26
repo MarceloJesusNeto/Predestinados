@@ -1,21 +1,23 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CineMatch - Chat</title>
-  <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <header class="navbar">
-    <h1 class="logo">CineMatch</h1>
+<header>
+    <h1>CineMatch</h1>
     <nav>
-      <a href="pesquisa.html" class="nav-btn">🔎</a>
-      <a href="chat.html" class="nav-btn">💬</a>
-      <a href="curtidos.html" class="nav-btn">❤️</a>
-      <a href="perfil.html" class="nav-btn">👤</a>
+        <a href="/"><i class="fa-solid fa-house"></i></a>
+        <a href="/pesquisa"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="/chat"><i class="fa-solid fa-comment"></i></a>
+        <a href="/curtidos"><i class="fa-solid fa-heart"></i></a>
+        <a href="/perfil"><i class="fa-solid fa-user"></i></a>
     </nav>
-  </header>
+</header>
 
   <main class="container">
     <section class="chat-section">
@@ -26,13 +28,13 @@
 
         <form id="chat-form" class="chat-form">
           <input id="chat-input" type="text" placeholder="Escreva uma mensagem..." autocomplete="off" />
-          <button type="submit" class="btn-curti">Enviar</button>
+          <button type="submit" class="btn-enviar">Enviar</button>
           <button type="button" id="chat-clear" class="btn-nao">Limpar</button>
         </form>
       </div>
     </section>
   </main>
 
-  <script src="app.js"></script>
+<script th:src="@{/app.js}"></script>
 </body>
 </html>
