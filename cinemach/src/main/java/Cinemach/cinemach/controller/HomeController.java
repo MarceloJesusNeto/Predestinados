@@ -1,14 +1,13 @@
 package Cinemach.cinemach.controller;
 
 import Cinemach.cinemach.model.Filme;
+import Cinemach.cinemach.model.Usuario;
+import Cinemach.cinemach.repository.UsuarioRepository;
 import Cinemach.cinemach.service.ImdbService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,40 +15,48 @@ import java.util.List;
 public class HomeController {
 
     private final ImdbService imdbService;
+    private final UsuarioRepository usuarioRepository;
 
-    public HomeController(ImdbService imdbService) {
+    public HomeController(ImdbService imdbService, UsuarioRepository usuarioRepository) {
         this.imdbService = imdbService;
+        this.usuarioRepository = usuarioRepository;
     }
 
-    @GetMapping("/chat")
-    public String chat(){
-        return "chat";
-    }
-
-    @GetMapping("/curtidos")
-    public String fav(){
-        return "curtidos";
-    }
-
-    @GetMapping("/perfil")
-    public String perfil(){
-        return "perfil";
-    }
-
-    @GetMapping("/pesquisa")
-    public String pesquisa(@RequestParam(required = false) String q, Model model) {
-        List<Filme> filmes;
-
-        if (q != null && !q.isBlank()) {
-            filmes = imdbService.buscarPorTitulo(q);
-        } else {
-            filmes = List.of();
+    @GetMapping("/login")
+    public String login(@RequestParam(value = "error", required = false) String error, Model model) {
+        if (error != null) {
+            model.addAttribute("erro", "Email ou senha inválidos!");
         }
+        return "login";
+    }
 
-        model.addAttribute("filmes", filmes);
-        model.addAttribute("query", q);
+    @GetMapping("/registrar")
+    public String registro() {
+        return "cadastro";
+    }
 
-        return "pesquisa";
+    @PostMapping("/registrar")
+    public String registrar(@ModelAttribute Usuario usuario, Model model) {
+        try {
+            if (usuarioRepository.findByEmail(usuario.getEmail()) != null) {
+                model.addAttribute("erro", "Email já cadastrado!");
+                return "cadastro";
+            }
+
+            // regex
+            if (!usuario.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+                model.addAttribute("erro", "Digite um e-mail válido!");
+                return "cadastro";
+            }
+
+            usuarioRepository.save(usuario);
+
+            model.addAttribute("msg", "Cadastro realizado com sucesso! Faça login.");
+            return "login";
+        } catch (Exception e) {
+            model.addAttribute("erro", "Erro ao cadastrar: " + e.getMessage());
+            return "cadastro";
+        }
     }
 
     @GetMapping("/")
@@ -67,10 +74,63 @@ public class HomeController {
         return "home";
     }
 
+
+    @GetMapping("/pesquisa")
+    public String pesquisa(@RequestParam(required = false) String q,
+                           HttpSession session,
+                           Model model) {
+        if (session.getAttribute("usuarioLogado") == null) {
+            model.addAttribute("erro", "Faça login para pesquisar filmes.");
+            return "login";
+        }
+
+        List<Filme> filmes;
+
+        if (q != null && !q.isBlank()) {
+            filmes = imdbService.buscarPorTitulo(q);
+        } else {
+            filmes = List.of();
+        }
+
+        model.addAttribute("filmes", filmes);
+        model.addAttribute("query", q);
+
+        return "pesquisa";
+    }
+
+
+    @GetMapping("/chat")
+    public String chat(HttpSession session, Model model) {
+        if (session.getAttribute("usuarioLogado") == null) {
+            model.addAttribute("erro", "Você precisa estar logado para acessar o chat.");
+            return "login";
+        }
+        return "chat";
+    }
+
+
+    @GetMapping("/curtidos")
+    public String curtidos(HttpSession session, Model model) {
+        if (session.getAttribute("usuarioLogado") == null) {
+            model.addAttribute("erro", "Faça login para ver seus filmes curtidos.");
+            return "login";
+        }
+        return "curtidos";
+    }
+
+
+    @GetMapping("/perfil")
+    public String perfil(HttpSession session, Model model) {
+        if (session.getAttribute("usuarioLogado") == null) {
+            model.addAttribute("erro", "Você precisa estar logado para ver seu perfil.");
+            return "login";
+        }
+        return "perfil";
+    }
+
     @GetMapping("/detalhes/{imdbId}")
     @ResponseBody
     public Filme getDetalhes(@PathVariable String imdbId) {
         return imdbService.buscarDetalhes(imdbId);
     }
-
 }

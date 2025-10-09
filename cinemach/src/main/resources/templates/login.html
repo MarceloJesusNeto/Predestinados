@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineMatch - Login</title>
+  <link rel="stylesheet" th:href="@{/css/login.css}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a2b5e9f5b2.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <div class="left-side">
+    <div class="overlay"></div>
+    <div class="left-content">
+      <h1 class="logo">CineMatch</h1>
+      <p class="subtitle">descubra filmes e pessoas com gostos parecidos</p>
+    </div>
+  </div>
+
+  <div class="right-side">
+    <div class="login-box">
+      <h2>Entrar</h2>
+
+
+        <form action="/login" method="post" autocomplete="on">
+
+        <div class="input-group">
+
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Digite seu e-mail"
+            required
+            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+          >
+        </div>
+
+        <div class="input-group">
+          
+          <input
+            type="password"
+            id="senha"
+            name="senha"
+            placeholder="Digite sua senha"
+            required
+            minlength="6"
+          >
+        </div>
+
+        <button type="submit">Entrar</button>
+
+          <p th:if="${erro}" style="color: red; margin-top: 10px;" th:text="${erro}"></p>
+      </form>
+
+      <p class="signup-text">
+        Não tem conta ainda?
+        <a href="/registrar">Criar conta</a>
+      </p>
+    </div>
+  </div>
+
+</body>
+</html>

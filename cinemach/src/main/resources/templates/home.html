@@ -145,6 +145,21 @@
           display: none; /* começa escondida */
         }
 
+        .btn-login, .btn-cadastrar {
+  background: #6a0dad;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  margin-left: 10px;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-login:hover, .btn-cadastrar:hover {
+  background: #8b2cff;
+  transform: scale(1.05);
+}
         .btn-descricao {
           background-color: #6c63ff;
           color: white;
@@ -234,7 +249,7 @@
     </style>
 </head>
 <body>
-<header>
+<header th:if="${session.usuarioLogado != null}">
     <h1>CineMatch</h1>
     <nav>
         <a href="/"><i class="fa-solid fa-house"></i></a>
@@ -242,6 +257,15 @@
         <a href="/chat"><i class="fa-solid fa-comment"></i></a>
         <a href="/curtidos"><i class="fa-solid fa-heart"></i></a>
         <a href="/perfil"><i class="fa-solid fa-user"></i></a>
+        <a href="/logout" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></a>
+    </nav>
+</header>
+
+<header th:if="${session.usuarioLogado == null}">
+    <h1>CineMatch</h1>
+    <nav>
+        <a href="/login" class="btn-login">Entrar</a>
+        <a href="/registrar" class="btn-cadastrar">Cadastrar</a>
     </nav>
 </header>
 

@@ -4,11 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CineMatch - Chat</title>
-    <link rel="stylesheet" th:href="@{/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-<header>
+<header th:if="${session.usuarioLogado != null}">
     <h1>CineMatch</h1>
     <nav>
         <a href="/"><i class="fa-solid fa-house"></i></a>
@@ -16,6 +16,15 @@
         <a href="/chat"><i class="fa-solid fa-comment"></i></a>
         <a href="/curtidos"><i class="fa-solid fa-heart"></i></a>
         <a href="/perfil"><i class="fa-solid fa-user"></i></a>
+        <a href="/logout" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></a>
+    </nav>
+</header>
+
+<header th:if="${session.usuarioLogado == null}">
+    <h1>CineMatch</h1>
+    <nav>
+        <a href="/login" class="btn-login">Entrar</a>
+        <a href="/registrar" class="btn-cadastrar">Cadastrar</a>
     </nav>
 </header>
 
