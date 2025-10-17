@@ -17,6 +17,17 @@ public class Usuario {
 
     private String senha;
 
+    @Column(length = 255)
+    private String generos; // ← novo campo
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public void setSenha(String senha) {
         this.senha = new BCryptPasswordEncoder().encode(senha);
     }
@@ -39,5 +50,13 @@ public class Usuario {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getGeneros() {
+        return generos;
+    }
+
+    public void setGeneros(String generos) {
+        this.generos = generos;
     }
 }

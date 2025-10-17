@@ -2,6 +2,7 @@ package Cinemach.cinemach.controller;
 
 import Cinemach.cinemach.model.Usuario;
 import Cinemach.cinemach.repository.UsuarioRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -10,6 +11,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.servlet.http.Cookie;
+
 
 @Controller
 public class AuthController {
@@ -21,6 +24,7 @@ public class AuthController {
     public String login(@RequestParam String email,
                         @RequestParam String senha,
                         HttpSession session,
+                        HttpServletResponse response,
                         Model model) {
         Usuario usuario = usuarioRepository.findByEmail(email);
 
@@ -36,17 +40,35 @@ public class AuthController {
         }
 
         session.setAttribute("usuarioLogado", usuario);
+
+        Cookie id = new Cookie("usuarioId", usuario.getId().toString());
+        Cookie nome = new Cookie("nomeUsuario", usuario.getNome());
+        id.setPath("/");
+        nome.setPath("/");
+        id.setMaxAge(60 * 60 * 24 * 365); // 1 ano
+        nome.setMaxAge(60 * 60 * 24 * 365);
+        response.addCookie(id);
+        response.addCookie(nome);
+
         return "redirect:/";
     }
 
     @GetMapping("/logout")
-    public String logout(HttpSession session, Model model) {
-        if (session.getAttribute("usuarioLogado") == null) {
-            model.addAttribute("erro", "Você precisa estar logado para sair.");
-            return "login";
-        }
-
+    public String logout(HttpSession session, HttpServletResponse response) {
         session.invalidate();
+
+        // limpa cookies
+        Cookie id = new Cookie("usuarioId", "");
+        id.setMaxAge(0);
+        id.setPath("/");
+
+        Cookie nome = new Cookie("nomeUsuario", "");
+        nome.setMaxAge(0);
+        nome.setPath("/");
+
+        response.addCookie(id);
+        response.addCookie(nome);
+
         return "redirect:/";
     }
 }

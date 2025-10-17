@@ -1,69 +1,121 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CineMatch - Cadastro</title>
-  <link rel="stylesheet" th:href="@{/css/cadastro.css}">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a2b5e9f5b2.js" crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch - Cadastro</title>
+    <link rel="stylesheet" th:href="@{/css/cadastro.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
-  <div class="left-side">
+<div class="left-side">
     <div class="form-container">
-      <h1>Crie sua conta</h1>
-      <form th:action="@{/registrar}" method="post" novalidate>
-        
-     
-        <input 
-          type="text" 
-          id="nome" 
-          name="nome"
-          placeholder="Digite seu nome completo" 
-          required
-          minlength="3"
-        >
+        <h1>Crie sua conta</h1>
 
-   
-        <input 
-          type="email" 
-          id="email" 
-          name="email"
-          placeholder="Digite seu email" 
-          required
-          pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-        >
+        <form th:action="@{/registrar}" method="post" novalidate>
 
-  
-        <input 
-          type="password" 
-          id="senha" 
-          name="senha"
-          placeholder="Digite uma senha" 
-          required
-          minlength="8"
-        >
+            <input
+                    type="text"
+                    id="nome"
+                    name="nome"
+                    placeholder="Digite seu nome ou apelido"
+                    required
+                    minlength="3"
+            >
 
-        <button type="submit">Cadastrar-se</button>
+            <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Digite seu email"
+                    required
+                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+            >
 
-          <p th:if="${erro}" style="color:red;" th:text="${erro}"></p>
-          <p th:if="${msg}" style="color:green;" th:text="${msg}"></p>
-      </form>
+            <input
+                    type="password"
+                    id="senha"
+                    name="senha"
+                    placeholder="Digite uma senha"
+                    required
+                    minlength="8"
+            >
 
-      <p class="login-text">
-        Já tem uma conta? <a  href="/login">Faça Login</a>
-      </p>
+            <input type="hidden" id="generos" name="generos">
+
+            <button type="submit">Cadastrar-se</button>
+
+            <p th:if="${erro}" style="color:red;" th:text="${erro}"></p>
+            <p th:if="${msg}" style="color:green;" th:text="${msg}"></p>
+        </form>
+
+        <p class="login-text">
+            Já tem uma conta? <a href="/login">Faça Login</a>
+        </p>
     </div>
-  </div>
+</div>
 
-  <div class="right-side">
+<div class="right-side">
     <div class="overlay"></div>
-    <div class="right-content">
-      <h1 class="logo">CineMatch</h1>
-      <p class="subtitle">Descubra filmes e pessoas<br>com gostos parecidos</p>
+    <div class="genre-container">
+        <h2>Escolha seus gêneros favoritos</h2>
+        <p>assim o CineMatch sabe quais filmes merecem o destaque na sua tela.</p>
+
+        <div class="genres-grid">
+            <div class="genre"><i data-lucide="smile"></i><span>Comédia</span></div>
+            <div class="genre"><i data-lucide="heart"></i><span>Romance</span></div>
+            <div class="genre"><i data-lucide="zap"></i><span>Ação</span></div>
+            <div class="genre"><i data-lucide="rocket"></i><span>Ficção Científica</span></div>
+            <div class="genre"><i data-lucide="ghost"></i><span>Terror</span></div>
+            <div class="genre"><i data-lucide="users"></i><span>Família</span></div>
+            <div class="genre"><i data-lucide="music"></i><span>Musical</span></div>
+            <div class="genre"><i data-lucide="book-open"></i><span>Documentário</span></div>
+            <div class="genre"><i data-lucide="drama"></i><span>Drama</span></div>
+        </div>
     </div>
-  </div>
+</div>
+
+<script>
+    lucide.createIcons();
+
+const genres = document.querySelectorAll('.genre');
+const inputGeneros = document.getElementById('generos');
+const form = document.querySelector('form');
+
+genres.forEach(genre => {
+  genre.addEventListener('click', () => {
+    const selectedGenres = document.querySelectorAll('.genre.selected');
+
+    // Desmarca se já estava marcado
+    if (genre.classList.contains('selected')) {
+      genre.classList.remove('selected');
+    } else {
+      // Impede selecionar mais de 3
+      if (selectedGenres.length >= 3) {
+        alert("Você só pode escolher até 3 gêneros favoritos.");
+        return;
+      }
+      genre.classList.add('selected');
+    }
+
+    // Atualiza o campo hidden com os gêneros selecionados
+    const selecionados = Array.from(document.querySelectorAll('.genre.selected span'))
+      .map(span => span.textContent);
+    inputGeneros.value = selecionados.join(',');
+  });
+});
+
+// Validação antes de enviar o formulário
+form.addEventListener('submit', (e) => {
+  const selecionados = document.querySelectorAll('.genre.selected');
+  if (selecionados.length !== 3) {
+    e.preventDefault();
+    alert("Escolha exatamente 3 gêneros favoritos antes de prosseguir!");
+  }
+});
+</script>
 
 </body>
 </html>

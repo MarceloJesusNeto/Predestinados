@@ -109,6 +109,52 @@
           border-radius: 8px;
         }
 
+.botoes {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.botao-modern {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #181818;
+  color: #fff;
+  border: 1px solid #7a42ff;
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 0 5px rgba(122, 66, 255, 0.2);
+}
+
+.botao-modern i {
+  font-size: 1rem;
+}
+
+.botao-modern:hover {
+  background: linear-gradient(90deg, #7a42ff, #b174ff);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(122, 66, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+.botao-modern.favoritado {
+  background: linear-gradient(90deg, #ff3366, #ff6699);
+  border-color: #ff6699;
+  box-shadow: 0 0 10px rgba(255, 99, 132, 0.7);
+}
+
+.botao-modern.salvo {
+  background: linear-gradient(90deg, #4caf50, #7bdc7d);
+  border-color: #7bdc7d;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+}
+
         .card h3 {
           margin: 10px 0 5px;
           font-size: 18px;

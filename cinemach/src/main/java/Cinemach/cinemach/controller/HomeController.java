@@ -36,23 +36,32 @@ public class HomeController {
     }
 
     @PostMapping("/registrar")
-    public String registrar(@ModelAttribute Usuario usuario, Model model) {
+    public String registrar(@ModelAttribute Usuario usuario,
+                            @RequestParam(value = "generos", required = false) String generos,
+                            Model model) {
         try {
             if (usuarioRepository.findByEmail(usuario.getEmail()) != null) {
                 model.addAttribute("erro", "Email já cadastrado!");
                 return "cadastro";
             }
 
-            // regex
             if (!usuario.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
                 model.addAttribute("erro", "Digite um e-mail válido!");
                 return "cadastro";
             }
 
+            // ⚠️ Validação: precisa ter exatamente 3 gêneros
+            if (generos == null || generos.isBlank() || generos.split(",").length != 3) {
+                model.addAttribute("erro", "Escolha exatamente 3 gêneros favoritos!");
+                return "cadastro";
+            }
+
+            usuario.setGeneros(generos);
             usuarioRepository.save(usuario);
 
             model.addAttribute("msg", "Cadastro realizado com sucesso! Faça login.");
             return "login";
+
         } catch (Exception e) {
             model.addAttribute("erro", "Erro ao cadastrar: " + e.getMessage());
             return "cadastro";
@@ -107,17 +116,6 @@ public class HomeController {
         }
         return "chat";
     }
-
-
-    @GetMapping("/curtidos")
-    public String curtidos(HttpSession session, Model model) {
-        if (session.getAttribute("usuarioLogado") == null) {
-            model.addAttribute("erro", "Faça login para ver seus filmes curtidos.");
-            return "login";
-        }
-        return "curtidos";
-    }
-
 
     @GetMapping("/perfil")
     public String perfil(HttpSession session, Model model) {
