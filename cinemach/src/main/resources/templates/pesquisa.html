@@ -82,18 +82,13 @@
 
         /* Card */
         .card {
+          width: 180px;
           background: #1a1a1a;
-          padding: 15px;
-          border-radius: 12px;
-          box-shadow: 0 4px 8px rgba(0,0,0,0.6);
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          align-items: center;
+          border-radius: 10px;
           text-align: center;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-          width: 380px;
-          height: 580px;
+          color: white;
+          padding: 10px;
+          transition: 0.2s;
         }
 
         .card:hover {
@@ -116,7 +111,7 @@
   margin-top: 12px;
 }
 
-.botao-modern {
+.btn-favoritar {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -132,24 +127,24 @@
   box-shadow: 0 0 5px rgba(122, 66, 255, 0.2);
 }
 
-.botao-modern i {
+.btn-favoritar i {
   font-size: 1rem;
 }
 
-.botao-modern:hover {
+.btn-favoritar:hover {
   background: linear-gradient(90deg, #7a42ff, #b174ff);
   color: #fff;
   box-shadow: 0 0 10px rgba(122, 66, 255, 0.6);
   transform: translateY(-2px);
 }
 
-.botao-modern.favoritado {
+.btn-favoritar.favoritado {
   background: linear-gradient(90deg, #ff3366, #ff6699);
   border-color: #ff6699;
   box-shadow: 0 0 10px rgba(255, 99, 132, 0.7);
 }
 
-.botao-modern.salvo {
+.btn-favoritar.salvo {
   background: linear-gradient(90deg, #4caf50, #7bdc7d);
   border-color: #7bdc7d;
   box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
@@ -316,32 +311,19 @@
         <button type="submit">Buscar</button>
     </form>
 
-    <section class="catalogo" id="catalogo">
+    <section th:if="${session.usuarioLogado != null}" class="catalogo" >
         <div th:each="filme : ${filmes}" class="card">
             <img th:src="${filme.imagem}" alt="Poster do filme" loading="lazy">
-            <!-- TÍTULO -->
             <h3 th:text="${filme.titulo}"></h3>
-
-            <!-- Gênero -->
-            <p th:attr="id='genero-' + ${filme.imdbId}" style="display:none;"></p>
-
-            <!-- Nota -->
-            <p th:attr="id='nota-' + ${filme.imdbId}" style="display:none;"></p>
-
-            <!-- DETALHES (descrição escondida) -->
-            <div th:attr="id='detalhes-' + ${filme.imdbId}" class="detalhes-box">
-                <p th:attr="id='descricao-' + ${filme.imdbId}"></p>
-            </div>
-
-            <!-- BOTÃO -->
-            <button class="btn-detalhes"
-                    th:attr="onclick='mostrarDetalhes(' + '\'' + ${filme.imdbId} + '\'' + ', this)'">
-                <i class="fa-solid fa-circle-info"></i> Mostrar detalhes
-            </button>
+            <p class = "gen" th:text="${filme.genero}"></p>
 
             <div class="botoes">
-                <button class="btn-like"><i class="fa-solid fa-thumbs-up"></i> Curtir</button>
-                <button class="btn-dislike"><i class="fa-solid fa-thumbs-down"></i> Não curtir</button>
+                <button th:data-id="${filme.imdbId}"
+                        th:data-titulo="${filme.titulo}"
+                        th:data-imagem="${filme.imagem}"
+                        th:data-genero="${filme.genero}" class="btn-favoritar" onclick="favoritarFilme(this)">
+                    <i class="fa-solid fa-heart"></i> Favoritar
+                </button>
             </div>
         </div>
     </section>
@@ -391,6 +373,44 @@
             descEl.innerText = "Erro ao carregar detalhes.";
         });
     }
+    function salvarFilme(botao) {
+      botao.classList.add("salvo");
+      botao.innerHTML = '<i class="fa-solid fa-check"></i> Salvo';
+      botao.disabled = true;
+    }
+
+    async function favoritarFilme(botao) {
+  const card = botao.closest(".card");
+  const imdbId = card.querySelector(".btn-favoritar").dataset.id;
+  const titulo = card.querySelector(".btn-favoritar").dataset.titulo;
+  const imagem = card.querySelector(".btn-favoritar").dataset.imagem;
+  const genero = card.querySelector(".btn-favoritar").dataset.genero;
+
+  try {
+    const resposta = await fetch("/favoritar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: `imdbId=${encodeURIComponent(imdbId)}&titulo=${encodeURIComponent(titulo)}&imagem=${encodeURIComponent(imagem)}&genero=${encodeURIComponent(genero)}`
+    });
+
+    const resultado = await resposta.text();
+
+    if (resultado === "ADICIONADO") {
+      botao.classList.add("favoritado");
+      botao.innerHTML = '<i class="fa-solid fa-heart-circle-check"></i> Favoritado';
+    } else if (resultado === "REMOVIDO") {
+      botao.classList.remove("favoritado");
+      botao.innerHTML = '<i class="fa-solid fa-heart"></i> Favoritar';
+    } else if (resultado.startsWith("ERRO")) {
+      alert("Você precisa estar logado para favoritar filmes.");
+    }
+  } catch (e) {
+    console.error("Erro ao favoritar:", e);
+    alert("Ocorreu um erro ao tentar favoritar o filme.");
+  }
+}
 </script>
 </body>
 </html>

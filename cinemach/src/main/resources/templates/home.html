@@ -51,18 +51,13 @@
         }
 
         .card {
+          width: 180px;
           background: #1a1a1a;
-          padding: 15px;
-          border-radius: 12px;
-          box-shadow: 0 4px 8px rgba(0,0,0,0.6);
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-start;
-          align-items: center;
+          border-radius: 10px;
           text-align: center;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-          width: 320px;
-          min-height: 520px;
+          color: white;
+          padding: 10px;
+          transition: 0.2s;
         }
 
         .card:hover {
@@ -103,7 +98,7 @@
   display: flex;
   justify-content: center;
   gap: 10px;
-  margin-top: 12px;
+  margin-top: auto;
 }
 
 .btn-favoritar {
@@ -120,6 +115,7 @@
   cursor: pointer;
   transition: all 0.25s ease;
   box-shadow: 0 0 5px rgba(122, 66, 255, 0.2);
+  margin-top = auto;
 }
 
 .btn-favoritar i {
@@ -239,6 +235,10 @@
   justify-content: center;
 }
 
+.gen{
+    margin-bottom: auto;
+}
+
 .tag-genero {
   background: #333;
   color: #ddd;
@@ -335,28 +335,11 @@
 <main>
     <h2>Descubra filmes incríveis e pessoas com gostos semelhantes</h2>
 
-    <section class="catalogo" id="catalogo">
+    <section th:if="${session.usuarioLogado != null}" class="catalogo" >
         <div th:each="filme : ${filmes}" class="card">
             <img th:src="${filme.imagem}" alt="Poster do filme" loading="lazy">
-            <!-- TÍTULO -->
             <h3 th:text="${filme.titulo}"></h3>
-
-            <!-- Gênero -->
-            <p th:attr="id='genero-' + ${filme.imdbId}" style="display:none;"></p>
-
-            <!-- Nota -->
-            <p th:attr="id='nota-' + ${filme.imdbId}" style="display:none;"></p>
-
-            <!-- DETALHES (descrição escondida) -->
-            <div th:attr="id='detalhes-' + ${filme.imdbId}" class="detalhes-box">
-                <p th:attr="id='descricao-' + ${filme.imdbId}"></p>
-            </div>
-
-            <!-- BOTÃO -->
-            <button class="btn-detalhes"
-                    th:attr="onclick='mostrarDetalhes(' + '\'' + ${filme.imdbId} + '\'' + ', this)'">
-                <i class="fa-solid fa-circle-info"></i> Mostrar detalhes
-            </button>
+            <p class = "gen" th:text="${filme.genero}"></p>
 
             <div class="botoes">
                 <button th:data-id="${filme.imdbId}"
@@ -368,6 +351,14 @@
             </div>
         </div>
     </section>
+    <section th:if="${session.usuarioLogado == null}" class="catalogo" id="catalogo">
+        <div th:each="filme : ${filmes}" class="card">
+            <img th:src="${filme.imagem}" alt="Poster do filme" loading="lazy">
+            <h3 th:text="${filme.titulo}"></h3>
+            <p class = "gen" th:text="${filme.genero}"></p>
+        </div>
+    </section>
+
 </main>
 
 <script>
@@ -409,6 +400,49 @@
     alert("Ocorreu um erro ao tentar favoritar o filme.");
   }
 }
+    function mostrarDetalhes(imdbId, botao) {
+        const box = document.getElementById("detalhes-" + imdbId);
+        const descEl = document.getElementById("descricao-" + imdbId);
+        const generoEl = document.getElementById("genero-" + imdbId);
+        const notaEl = document.getElementById("nota-" + imdbId);
+
+        if (box.classList.contains("visible")) {
+            // Esconder
+            box.classList.remove("visible");
+            botao.innerHTML = '<i class="fa-solid fa-circle-info"></i> Mostrar detalhes';
+            return;
+        }
+
+        // Se já carregou antes, só mostrar
+        if (descEl.innerText && descEl.innerText !== "Carregando...") {
+            box.classList.add("visible");
+            botao.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Ocultar detalhes';
+            return;
+        }
+
+        // Carregar dados do backend
+        descEl.innerText = "Carregando...";
+        generoEl.innerText = "Carregando...";
+        notaEl.innerText = "⭐ ...";
+
+        fetch("/detalhes/" + imdbId)
+        .then(r => r.json())
+        .then(filme => {
+            descEl.innerText = filme.descricao || "Descrição não encontrada.";
+
+            generoEl.innerText = filme.genero || "Desconhecido";
+            generoEl.style.display = "block";
+
+            notaEl.innerText = "⭐ " + (filme.nota || "N/A");
+            notaEl.style.display = "block";
+
+            box.classList.add("visible");
+            botao.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Ocultar detalhes';
+        })
+        .catch(() => {
+            descEl.innerText = "Erro ao carregar detalhes.";
+        });
+    }
 </script>
 </body>
 </html>
