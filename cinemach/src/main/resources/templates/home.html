@@ -1,99 +1,236 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>CineMatch</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" href="/img/cinematchlogo1-removebg-preview (1).png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
     <style>
+        /* --- estilos existentes --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html,body { height: 100%; }
+
         body {
-          background-color: #111;
-          color: white;
-          margin: 0;
           font-family: Arial, sans-serif;
+          background: #0b0014;
+          color: #fff;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
         }
 
+        /* HEADER */
         header {
-          background-color: #000;
-          padding: 15px;
+            font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+          position: fixed;
+          top: 0; left: 0; width: 100%;
+          height: 100px;
+          z-index: 150;
           display: flex;
           justify-content: space-between;
           align-items: center;
+          padding: 14px 28px;
+          background: rgba(0,0,0,0.55);
+          backdrop-filter: blur(6px);
+          border-bottom: 1px solid rgba(255,255,255,0.03);
         }
 
+        /* NOVO: ícone ao lado do nome */
         header h1 {
-          color: #c700ff;
-          margin: 0;
+          color: #d46aff;
+          font-size: 1.4rem;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        header h1 i {
+          color: #b174ff;
+          font-size: 1.3rem;
         }
 
-        nav a {
-          color: white;
-          margin-left: 15px;
-          text-decoration: none;
-          font-size: 18px;
-        }
+        header nav a { color: #fff; margin-left: 14px; text-decoration: none; font-size: 1.05rem; }
+        .header-actions a { background: linear-gradient(90deg,#7a42ff,#b174ff);
+         color: #fff;
+         padding: 8px 12px;
+         border-radius: 10px;
+         text-decoration: none; margin-left:8px;
+         font-weight: 600;
+         display:inline-block;
 
-        main {
-          padding: 20px;
-        }
+         }
 
-        h2 {
+        main { margin:20px 0px 0px 0px; }
+
+        /* === HERO === */
+        .hero {
+          position: relative;
+          height: calc(92vh - 84px);
+          min-height: 520px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           text-align: center;
-          color: #c700ff;
+          overflow: hidden;
+          padding: 40px 20px;
+           font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
         }
 
+        .hero-bg {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+          background-image:
+            linear-gradient(120deg, rgba(10,0,25,0.75), rgba(0,0,0,0.8)),
+            url('/img/login.png');
+          background-size: cover;
+          background-position: center;
+          transform: scale(1.05);
+          animation: zoomFade 5s ease-in-out forwards;
+          opacity: 0;
+        }
+
+        @keyframes zoomFade {
+          0% { opacity: 0; transform: scale(1.15); }
+          100% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .hero-overlay {
+          position: absolute;
+          inset: 0;
+          z-index: 2;
+          background: radial-gradient(circle at 50% 50%, rgba(255,0,120,0.15), transparent 60%);
+          animation: floatLights 12s ease-in-out infinite alternate;
+          pointer-events: none;
+        }
+
+        @keyframes floatLights {
+          0% { transform: translateY(0px) rotate(0deg); }
+          100% { transform: translateY(-6px) rotate(1deg); }
+        }
+
+        .hero-content {
+          position: relative;
+          z-index: 3;
+          max-width: 900px;
+          padding: 28px;
+          color: #fff;
+          text-align: center;
+          animation: fadeText 2s ease-in-out forwards;
+          opacity: 0;
+        }
+
+        @keyframes fadeText {
+          0% { opacity: 0; transform: translateY(30px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero .bemvindo {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1rem;
+          color: #ffc7ff;
+          margin-bottom: 10px;
+          opacity: 0.95;
+          letter-spacing: 0.4px;
+          gap: 10px;
+        }
+
+        /* NOVO: imagem entre "bem vindo ao" e "CineMatch" */
+        .bemvindo img {
+          width: 36px;
+          height: 36px;
+          border-radius: 6px;
+          object-fit: cover;
+          box-shadow: 0 0 10px rgba(183,85,255,0.4);
+        }
+
+        .hero .titulo-hero {
+          font-size: clamp(32px, 6vw, 64px);
+          color: #ffb6ff;
+          margin: 10px 0 12px;
+          line-height: 1;
+          text-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 28px rgba(210,106,255,0.22);
+          font-weight: 700;
+          animation: glow 3.6s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+          0% { text-shadow: 0 6px 14px rgba(210,106,255,0.14); }
+          50% { text-shadow: 0 10px 34px rgba(255,102,220,0.28); }
+          100% { text-shadow: 0 6px 14px rgba(210,106,255,0.14); }
+        }
+
+        .btn-hero { display: inline-flex;
+         align-items: center; justify-content: center;
+         gap: 10px;
+         padding: 14px 34px;
+         border-radius: 999px;
+         background: linear-gradient(90deg,#7a42ff,#b174ff,#ff6ee0);
+         color: #fff;
+         text-decoration: none; font-weight: 700;
+         box-shadow: 0 8px 40px rgba(122,66,255,0.18);
+         ransform-origin: center; transition: transform .28s ease, box-shadow .28s ease;
+         z-index: 4; } .btn-hero:hover { transform: translateY(-6px); box-shadow: 0 18px 60px rgba(183,85,255,0.28); }
+
+        .hero .subtitulo-hero {
+          color: #e6e6ea;
+          max-width: 760px;
+          margin: 14px auto 24px;
+          font-size: 1.05rem;
+          line-height: 1.6;
+          opacity: 0.95;
+        }
+
+        /* NOVA SEÇÃO ENTRE HERO E CATÁLOGO */
+        .titulos-section {
+          position: relative;
+          padding: 80px 20px;
+          text-align: center;
+          background: rgba(15,0,25,0.4);
+          backdrop-filter: blur(10px);
+          border-top: 1px solid rgba(255,255,255,0.05);
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .titulos-section h2 {
+          font-size: clamp(26px, 4vw, 42px);
+          color: #ffb6ff;
+          text-shadow: 0 0 16px rgba(183,85,255,0.3);
+          letter-spacing: 1px;
+        }
+
+        /* CATÁLOGO mantido */
         .catalogo {
           display: flex;
           flex-wrap: wrap;
           justify-content: center;
           gap: 25px;
-          margin-top: 20px;
+          padding: 48px 28px 80px;
+          background: linear-gradient(180deg, rgba(13,13,15,0.02), rgba(13,13,15,0.05));
+          padding-top: 40px;
+          scroll-margin-top: 90px;
         }
 
-        .card {
-          width: 180px;
-          background: #1a1a1a;
-          border-radius: 10px;
-          text-align: center;
-          color: white;
-          padding: 10px;
-          transition: 0.2s;
-        }
+        .logo-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-        .card:hover {
-          transform: translateY(-8px) scale(1.03);
-          box-shadow: 0 8px 20px rgba(214, 51, 255, 0.6);
-        }
-
-        .card img {
-          width: 100%;
-          height: 280px;
-          object-fit: contain;
-          background: #000;
-          border-radius: 8px;
-        }
-
-        .card h3 {
-          margin: 10px 0 5px;
-          font-size: 18px;
-          color: #c700ff;
-        }
-
-        .card p {
-          margin: 4px 0;
-        }
-
-        .nota {
-          font-size: 14px;
-          font-weight: bold;
-          color: #ffcc00;
-          margin: 8px 0;
-        }
-
-        .nota i {
-          margin-right: 5px;
-        }
-
+.logo-header img {
+  width: 90px;
+  height: 90px;
+  border-radius: 8px;
+  object-fit: cover;
+}
 .botoes {
   display: flex;
   justify-content: center;
@@ -141,179 +278,152 @@
   box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
 }
 
-.detalhes-box {
-  background: #222;
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 8px;
-  color: #ccc;
-  font-size: 14px;
-  text-align: justify;
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: all 0.4s ease;
+.titulo-sessao {
+  position: relative;
+  background: linear-gradient(180deg, rgba(13, 13, 15, 0.02), rgba(13, 13, 15, 0.05));
+  backdrop-filter: blur(10px);
+  padding: 60px 20px 40px;
+  text-align: center;
+  border-top: 0px solid rgba(255,255,255,0.05);
+  border-bottom: 0px solid rgba(255,255,255,0.05);
+  font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
 }
 
-.detalhes-box.visible {
-  max-height: 500px;
-  opacity: 1;
+.titulo-sessao h2 {
+  font-size: clamp(28px, 5vw, 42px);
+  color: #ffb6ff;
+  text-shadow: 0 4px 16px rgba(210,106,255,0.25);
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
-.btn-detalhes {
-  background: #6a5acd;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: transform 0.2s ease, background 0.3s;
+.hero-img {
+  width: 90px;
+  height: 90px;
+  border-radius: 14px;
+  object-fit: cover;
+  margin: 8px 0 12px;
+  box-shadow: 0 0 18px rgba(210,106,255,0.25);
+  animation: fadeText 2s ease-in-out forwards;
 }
 
-.btn-detalhes:hover {
-  background: #836fff;
-  transform: scale(1.05);
-}
-
-
-
-        /* Descrição */
-        .descricao {
-          font-size: 14px;
-          color: #ccc;
-          margin: 8px 0;
-          line-height: 1.4em;
-          display: none; /* começa escondida */
-        }
-
-        .btn-login, .btn-cadastrar {
-  background: #6a0dad;
-  color: white;
-  padding: 10px 18px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: bold;
-  margin-left: 10px;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.btn-login:hover, .btn-cadastrar:hover {
-  background: #8b2cff;
-  transform: scale(1.05);
-}
-        .btn-descricao {
-          background-color: #6c63ff;
+        .card {
+          width: 180px;
+          background: linear-gradient(180deg, #161616, #141414);
+          border-radius: 10px;
+          text-align: center;
           color: white;
-          border: none;
-          padding: 6px 12px;
-          margin-top: 8px;
-          border-radius: 6px;
-          cursor: pointer;
-          font-size: 14px;
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          transition: background 0.3s ease;
+          padding: 10px;
+          transition: transform .22s ease, box-shadow .22s ease;
+          box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+          font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
         }
+        .card:hover { transform: translateY(-8px) scale(1.03); }
 
-        .btn-descricao:hover {
-          background-color: #574fd6;
+        .card img {
+          width: 100%;
+          height: 270px;
+          object-fit: cover;
+          border-radius: 8px;
+          background: #000;
         }
+        .card h3 { margin: 10px 0 6px; font-size: 16px; color: #d46aff; }
+        .card p { margin: 0; font-size: 13px; color: #cfcfcf; }
 
-        .botoes {
-          display: flex;
-          justify-content: center;
-          gap: 12px;
-          margin-top: auto;
-        }
-.generos {
-  margin: 6px 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: center;
-}
+            .footer {
+      background-color: #111; /* fundo escuro */
+      color: #ddd;
+      padding: 60px 10%;
+      font-family: 'Poppins', sans-serif;
+    }
 
-.gen{
-    margin-bottom: auto;
-}
+    .footer-container {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #222;
+      padding-bottom: 30px;
+    }
 
-.tag-genero {
-  background: #333;
-  color: #ddd;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-}
+    .footer-col {
+      flex: 1;
+      min-width: 250px;
+      margin-bottom: 20px;
+    }
 
-.nota {
-  font-size: 15px;
-  font-weight: bold;
-  color: #ffcc00;
-  margin: 6px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
+    .footer-logo {
+      width: 140px;
+      margin-bottom: 15px;
+    }
 
-.btn-outline-primary, .btn-outline-danger {
-  transition: all 0.3s ease;
-  font-weight: 600;
-  border-radius: 10px;
-  padding: 6px 14px;
-}
+    .footer-col h4 {
+      color: #e50914; /* vermelho Cinemach */
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
 
-.btn-outline-primary:hover {
-  background-color: #007bff;
-  color: white;
-  transform: scale(1.05);
-}
+    .footer-col ul {
+      list-style: none;
+      padding: 0;
+    }
 
-.btn-outline-danger:hover {
-  background-color: #dc3545;
-  color: white;
-  transform: scale(1.05);
-}
+    .footer-col ul li {
+      margin-bottom: 10px;
+    }
 
-        .btn-like, .btn-dislike {
-          padding: 8px 14px;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-          font-size: 14px;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          transition: transform 0.2s ease, background 0.3s ease;
-          font-weight: bold;
-        }
+    .footer-col ul li a {
+      color: #ccc;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
 
-        .btn-like {
-          background: linear-gradient(135deg, #28a745, #34d058);
-          color: white;
-        }
+    .footer-col ul li a:hover {
+      color: #e50914;
+    }
 
-        .btn-like:hover {
-          transform: scale(1.1);
-          background: #218838;
-        }
+    .footer-col p {
+      margin: 8px 0;
+    }
 
-        .btn-dislike {
-          background: linear-gradient(135deg, #dc3545, #ff4d6d);
-          color: white;
-        }
+    .footer-col i {
+      color: #e50914;
+      margin-right: 8px;
+    }
 
-        .btn-dislike:hover {
-          transform: scale(1.1);
-          background: #c82333;
-        }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #999;
+    }
+
+    .footer-links a {
+      color: #999;
+      text-decoration: none;
+      margin: 0 5px;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: #e50914;
+    }
     </style>
 </head>
 <body>
 <header th:if="${session.usuarioLogado != null}">
-    <h1>CineMatch</h1>
+    <div class="logo-header">
+        <img src="/img/cinematchlogo1-removebg-preview.png" alt="CineMatch Logo">
+        <h1>CineMatch</h1>
+    </div>
     <nav>
         <a href="/"><i class="fa-solid fa-house"></i></a>
         <a href="/pesquisa"><i class="fa-solid fa-magnifying-glass"></i></a>
@@ -325,124 +435,163 @@
 </header>
 
 <header th:if="${session.usuarioLogado == null}">
-    <h1>CineMatch</h1>
-    <nav>
+    <div class="logo-header">
+        <img src="/img/cinematchlogo1-removebg-preview.png" alt="CineMatch Logo">
+        <h1>CineMatch</h1>
+    </div>
+    <div class="header-actions">
         <a href="/login" class="btn-login">Entrar</a>
         <a href="/registrar" class="btn-cadastrar">Cadastrar</a>
-    </nav>
+    </div>
 </header>
 
 <main>
-    <h2>Descubra filmes incríveis e pessoas com gostos semelhantes</h2>
 
-    <section th:if="${session.usuarioLogado != null}" class="catalogo" >
+    <section class="hero" id="inicio">
+        <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="bemvindo">🎥 Bem-vindo ao</div>
+
+            <div class="titulo-hero">CineMatch</div>
+            <div class="subtitulo-hero">
+                Onde o amor pelo cinema cria conexões reais.<br>
+                Descubra quem vibra, se emociona e sonha com as mesmas histórias que você.
+            </div>
+            <a href="#catalogo" class="btn-hero" id="btnExplorar">
+                <i class="fa-solid fa-film" href="/registrar"></i> Explorar Agora
+            </a>
+        </div>
+
+        <div class="scroll-indicator">
+            <div class="bar"></div>
+        </div>
+
+        <div class="wave">
+            <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+                <path d="M0,32 C220,120 440,0 720,48 C1000,96 1220,16 1440,64 L1440 120 L0 120 Z" fill="#0b0014"></path>
+            </svg>
+        </div>
+    </section>
+
+    <section class="titulo-sessao">
+        <div class="titulo-container">
+            <h2>🎬 Alguns títulos pra você:</h2>
+        </div>
+    </section>
+
+    <!-- CATÁLOGO original -->
+    <section th:if="${session.usuarioLogado != null}" class="catalogo" id="catalogo">
         <div th:each="filme : ${filmes}" class="card">
             <img th:src="${filme.imagem}" alt="Poster do filme" loading="lazy">
-            <h3 th:text="${filme.titulo}"></h3>
-            <p class = "gen" th:text="${filme.genero}"></p>
-
+            <h3 th:text="${filme.titulo}">Título</h3>
+            <p th:text="${filme.genero}">Gênero</p>
             <div class="botoes">
-                <button th:data-id="${filme.imdbId}"
-                        th:data-titulo="${filme.titulo}"
-                        th:data-imagem="${filme.imagem}"
-                        th:data-genero="${filme.genero}" class="btn-favoritar" onclick="favoritarFilme(this)">
+                <button th:data-id="${filme.imdbId}" th:data-titulo="${filme.titulo}"
+                        th:data-imagem="${filme.imagem}" th:data-genero="${filme.genero}"
+                        class="btn-favoritar" onclick="favoritarFilme(this)">
                     <i class="fa-solid fa-heart"></i> Favoritar
                 </button>
             </div>
         </div>
     </section>
-    <section th:if="${session.usuarioLogado == null}" class="catalogo" id="catalogo">
+
+    <section th:if="${session.usuarioLogado == null}" class="catalogo">
         <div th:each="filme : ${filmes}" class="card">
             <img th:src="${filme.imagem}" alt="Poster do filme" loading="lazy">
-            <h3 th:text="${filme.titulo}"></h3>
-            <p class = "gen" th:text="${filme.genero}"></p>
+            <h3 th:text="${filme.titulo}">Título</h3>
+            <p th:text="${filme.genero}">Gênero</p>
         </div>
     </section>
-
 </main>
 
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-col">
+            <img th:src="@{/img/cinematchlogo1-removebg-preview.png}" alt="Cinemach" class="footer-logo">
+            <p>Soluções de recomendação e descoberta de filmes personalizadas.</p>
+        </div>
+
+        <div class="footer-col">
+            <h4>Links Rápidos</h4>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/registrar">Pesquisar</a></li>
+                <li><a href="/registrar">Chat</a></li>
+                <li><a href="/registrar">Favoritos</a></li>
+                <li><a href="/registrar">Perfil</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4>Contato</h4>
+            <p><i class="fa-solid fa-location-dot"></i> Rua Exemplo, 123 - São Paulo, SP</p>
+            <p><i class="fa-solid fa-phone"></i> (11) 1234-5678</p>
+            <p><i class="fa-solid fa-envelope"></i> contato@cinematch.com.br</p>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>© 2025 Cinematch. Todos os direitos reservados.</p>
+    </div>
+</footer>
+
+<script src="https://kit.fontawesome.com/a2e0e6c6c1.js" crossorigin="anonymous"></script>
+
 <script>
-    function salvarFilme(botao) {
-      botao.classList.add("salvo");
-      botao.innerHTML = '<i class="fa-solid fa-check"></i> Salvo';
-      botao.disabled = true;
-    }
+    document.addEventListener("DOMContentLoaded", function() {
 
-    async function favoritarFilme(botao) {
-  const card = botao.closest(".card");
-  const imdbId = card.querySelector(".btn-favoritar").dataset.id;
-  const titulo = card.querySelector(".btn-favoritar").dataset.titulo;
-  const imagem = card.querySelector(".btn-favoritar").dataset.imagem;
-  const genero = card.querySelector(".btn-favoritar").dataset.genero;
+  // ===== BOTÃO "EXPLORAR AGORA" =====
+  const botaoExplorar = document.getElementById("btnExplorar");
+  if (botaoExplorar) {
+    botaoExplorar.addEventListener("click", function(e) {
+      e.preventDefault();
 
-  try {
-    const resposta = await fetch("/favoritar", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: `imdbId=${encodeURIComponent(imdbId)}&titulo=${encodeURIComponent(titulo)}&imagem=${encodeURIComponent(imagem)}&genero=${encodeURIComponent(genero)}`
+      const secaoCatalogo = document.getElementById("catalogo");
+      if (!secaoCatalogo) {
+        console.warn("Seção #catalogo não encontrada");
+        return;
+      }
+
+      const header = document.querySelector("header");
+      const headerAltura = header ? header.offsetHeight : 0;
+
+      const destino = secaoCatalogo.getBoundingClientRect().top + window.scrollY - headerAltura - 12;
+      window.scrollTo({ top: destino, behavior: "smooth" });
     });
-
-    const resultado = await resposta.text();
-
-    if (resultado === "ADICIONADO") {
-      botao.classList.add("favoritado");
-      botao.innerHTML = '<i class="fa-solid fa-heart-circle-check"></i> Favoritado';
-    } else if (resultado === "REMOVIDO") {
-      botao.classList.remove("favoritado");
-      botao.innerHTML = '<i class="fa-solid fa-heart"></i> Favoritar';
-    } else if (resultado.startsWith("ERRO")) {
-      alert("Você precisa estar logado para favoritar filmes.");
-    }
-  } catch (e) {
-    console.error("Erro ao favoritar:", e);
-    alert("Ocorreu um erro ao tentar favoritar o filme.");
   }
-}
-    function mostrarDetalhes(imdbId, botao) {
-        const box = document.getElementById("detalhes-" + imdbId);
-        const descEl = document.getElementById("descricao-" + imdbId);
-        const generoEl = document.getElementById("genero-" + imdbId);
-        const notaEl = document.getElementById("nota-" + imdbId);
 
-        if (box.classList.contains("visible")) {
-            // Esconder
-            box.classList.remove("visible");
-            botao.innerHTML = '<i class="fa-solid fa-circle-info"></i> Mostrar detalhes';
-            return;
-        }
+  // ===== FAVORITAR FILME =====
+  window.favoritarFilme = async function(botao) {
+    const imdbId = botao.getAttribute("data-id");
+    const titulo = botao.getAttribute("data-titulo");
+    const imagem = botao.getAttribute("data-imagem");
+    const genero = botao.getAttribute("data-genero");
 
-        // Se já carregou antes, só mostrar
-        if (descEl.innerText && descEl.innerText !== "Carregando...") {
-            box.classList.add("visible");
-            botao.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Ocultar detalhes';
-            return;
-        }
+    try {
+      const resposta = await fetch("/favoritar", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `imdbId=${encodeURIComponent(imdbId)}&titulo=${encodeURIComponent(titulo)}&imagem=${encodeURIComponent(imagem)}&genero=${encodeURIComponent(genero)}`
+      });
 
-        // Carregar dados do backend
-        descEl.innerText = "Carregando...";
-        generoEl.innerText = "Carregando...";
-        notaEl.innerText = "⭐ ...";
+      const resultado = await resposta.text();
 
-        fetch("/detalhes/" + imdbId)
-        .then(r => r.json())
-        .then(filme => {
-            descEl.innerText = filme.descricao || "Descrição não encontrada.";
-
-            generoEl.innerText = filme.genero || "Desconhecido";
-            generoEl.style.display = "block";
-
-            notaEl.innerText = "⭐ " + (filme.nota || "N/A");
-            notaEl.style.display = "block";
-
-            box.classList.add("visible");
-            botao.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Ocultar detalhes';
-        })
-        .catch(() => {
-            descEl.innerText = "Erro ao carregar detalhes.";
-        });
+      if (resultado === "ADICIONADO") {
+        botao.classList.add("favoritado");
+        botao.innerHTML = '<i class="fa-solid fa-heart-circle-check"></i> Favoritado';
+      } else if (resultado === "REMOVIDO") {
+        botao.classList.remove("favoritado");
+        botao.innerHTML = '<i class="fa-solid fa-heart"></i> Favoritar';
+      } else if (resultado.startsWith("ERRO")) {
+        alert("Você precisa estar logado para favoritar filmes.");
+      }
+    } catch (erro) {
+      console.error("Erro ao favoritar:", erro);
+      alert("Ocorreu um erro ao tentar favoritar o filme.");
     }
+  };
+});
 </script>
 </body>
 </html>

@@ -10,7 +10,7 @@ import java.util.*;
 
 @Service
 public class ImdbService {
-    private static final String API_KEY = "fb475869";
+    private static final String API_KEY = "3f7558c4";
     private static final String SEARCH_URL = "https://www.omdbapi.com/?apikey=" + API_KEY + "&s=";
     private static final String DETAIL_URL = "https://www.omdbapi.com/?apikey=" + API_KEY + "&i=";
 
@@ -40,18 +40,13 @@ public class ImdbService {
                     JSONObject f = results.getJSONObject(i);
                     String imdbId = f.optString("imdbID", "");
 
-                    // já busca detalhes
                     Filme detalhes = buscarDetalhes(imdbId);
                     if (detalhes != null) {
                         filmes.add(detalhes);
                     }
                 }
             }
-            for (Filme f : filmes) {
-                System.out.println("DEBUG >>> " + f.getTitulo() +
-                        " | Genero: " + f.getGenero() +
-                        " | Nota: " + f.getNota());
-            }
+
             return filmes;
         } catch (Exception e) {
             System.err.println("Erro buscarPorTitulo: " + e.getMessage());
@@ -64,7 +59,7 @@ public class ImdbService {
         List<Filme> filmes = new ArrayList<>();
         try {
             Collections.shuffle(KEYWORDS);
-            List<String> escolhidos = KEYWORDS.subList(0, 5);
+            List<String> escolhidos = KEYWORDS.subList(0, 22);
 
             for (String palavra : escolhidos) {
                 String resposta = restTemplate.getForObject(SEARCH_URL + palavra, String.class);
@@ -81,10 +76,10 @@ public class ImdbService {
                         if (detalhes != null) {
                             filmes.add(detalhes);
                         }
-                        if (filmes.size() >= 20) break;
+                        if (filmes.size() >= 33) break;
                     }
                 }
-                if (filmes.size() >= 20) break;
+                if (filmes.size() >= 33) break;
             }
         } catch (Exception e) {
             System.err.println("Erro buscarFilmesAleatorios: " + e.getMessage());

@@ -50,7 +50,6 @@ public class HomeController {
                 return "cadastro";
             }
 
-            // ⚠️ Validação: precisa ter exatamente 3 gêneros
             if (generos == null || generos.isBlank() || generos.split(",").length != 3) {
                 model.addAttribute("erro", "Escolha exatamente 3 gêneros favoritos!");
                 return "cadastro";
@@ -73,7 +72,7 @@ public class HomeController {
         List<Filme> todosFilmes = imdbService.buscarFilmesAleatorios();
         session.setAttribute("filmesCache", todosFilmes);
 
-        int fim = Math.min(16, todosFilmes.size());
+        int fim = Math.min(27, todosFilmes.size());
         List<Filme> filmesPagina = todosFilmes.subList(0, fim);
 
         model.addAttribute("filmes", filmesPagina);
