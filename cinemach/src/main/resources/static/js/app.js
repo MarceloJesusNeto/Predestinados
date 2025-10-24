@@ -230,6 +230,56 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+    window.salvarFilme = async function(botao) {
+        const imdbId = botao.getAttribute("data-id");
+        const titulo = botao.getAttribute("data-titulo");
+        const imagem = botao.getAttribute("data-imagem");
+        const genero = botao.getAttribute("data-genero");
+
+        try {
+            const resposta = await fetch("/perfil/salvarFilme", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `imdbId=${encodeURIComponent(imdbId)}&titulo=${encodeURIComponent(titulo)}&imagem=${encodeURIComponent(imagem)}&genero=${encodeURIComponent(genero)}`
+            });
+
+            const resultado = await resposta.text();
+
+            if (resultado === "ADICIONADO") {
+                botao.classList.add("salvo");
+                botao.innerHTML = '<i class="fa-solid fa-bookmark-circle-check"></i> Salvo';
+            } else if (resultado === "REMOVIDO") {
+                botao.classList.remove("salvo");
+                botao.innerHTML = '<i class="fa-solid fa-bookmark"></i> Salvar';
+            } else if (resultado === "LIMITE") {
+                alert("Você já salvou o máximo de 10 filmes!");
+            } else if (resultado === "ERRO_LOGIN") {
+                alert("Você precisa estar logado para salvar filmes.");
+            }
+        } catch (erro) {
+            console.error("Erro ao salvar filme:", erro);
+            alert("Erro ao salvar filme.");
+        }
+    };
+
+    document.querySelectorAll('.btn-favorito').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const data = {
+          imdbId: btn.dataset.id,
+          titulo: btn.dataset.titulo,
+          imagem: btn.dataset.img,
+          genero: btn.dataset.genero
+        };
+        fetch('/perfil/salvarFilme', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: new URLSearchParams(data)
+        }).then(r => r.text()).then(resp => {
+          if (resp === 'REMOVIDO') btn.parentElement.remove();
+        });
+      });
+    });
+
   // -------------------------
   // chat.html -> mensagens simples (localStorage)
   // -------------------------

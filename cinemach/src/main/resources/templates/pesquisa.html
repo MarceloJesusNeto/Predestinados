@@ -5,10 +5,12 @@
     <title>CineMatch - Pesquisa</title>
     <link rel="shortcut icon" href="/img/cinematchlogo1-removebg-preview (1).png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
 
     <style>
         body {
-          background-color: #111;
+          background-color: linear-gradient(180deg, rgba(13, 13, 15, 0.02), rgba(13, 13, 15, 0.05));
           color: white;
           margin: 0;
           font-family: Arial, sans-serif;
@@ -35,12 +37,19 @@
         }
 
         main {
-          padding: 20px;
+          padding: 120px;
         }
 
         h2 {
           text-align: center;
           color: #c700ff;
+          color: rgb(255, 182, 255);
+    text-shadow: rgba(210, 106, 255, 0.25) 0px 4px 16px;
+           font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+            font-size: 33px;
         }
 
         /* Campo de pesquisa */
@@ -48,6 +57,10 @@
           display: flex;
           justify-content: center;
           margin: 20px 0;
+           font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
         }
 
         .barra-pesquisa input {
@@ -56,6 +69,10 @@
           border-radius: 8px 0 0 8px;
           border: none;
           font-size: 16px;
+           font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
         }
 
         .barra-pesquisa button {
@@ -66,6 +83,10 @@
           color: white;
           font-weight: bold;
           cursor: pointer;
+           font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
         }
 
         .barra-pesquisa button:hover {
@@ -81,76 +102,6 @@
           margin-top: 20px;
         }
 
-        /* Card */
-        .card {
-          width: 180px;
-          background: #1a1a1a;
-          border-radius: 10px;
-          text-align: center;
-          color: white;
-          padding: 10px;
-          transition: 0.2s;
-        }
-
-        .card:hover {
-          transform: translateY(-8px) scale(1.03);
-          box-shadow: 0 8px 20px rgba(214, 51, 255, 0.6);
-        }
-
-        .card img {
-          width: 100%;
-          height: 300px;
-          object-fit: contain;
-          background: #000;
-          border-radius: 8px;
-        }
-
-.botoes {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.btn-favoritar {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: #181818;
-  color: #fff;
-  border: 1px solid #7a42ff;
-  border-radius: 12px;
-  padding: 8px 14px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 0 5px rgba(122, 66, 255, 0.2);
-}
-
-.btn-favoritar i {
-  font-size: 1rem;
-}
-
-.btn-favoritar:hover {
-  background: linear-gradient(90deg, #7a42ff, #b174ff);
-  color: #fff;
-  box-shadow: 0 0 10px rgba(122, 66, 255, 0.6);
-  transform: translateY(-2px);
-}
-
-.btn-favoritar.favoritado {
-  background: linear-gradient(90deg, #ff3366, #ff6699);
-  border-color: #ff6699;
-  box-shadow: 0 0 10px rgba(255, 99, 132, 0.7);
-}
-
-.btn-favoritar.salvo {
-  background: linear-gradient(90deg, #4caf50, #7bdc7d);
-  border-color: #7bdc7d;
-  box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
-}
-
         .card h3 {
           margin: 10px 0 5px;
           font-size: 18px;
@@ -158,23 +109,23 @@
         }
 
         .detalhes-box {
-  background: #222;
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 8px;
-  color: #ccc;
-  font-size: 14px;
-  text-align: justify;
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: all 0.4s ease;
-}
+          background: #222;
+          padding: 10px;
+          border-radius: 8px;
+          margin-top: 8px;
+          color: #ccc;
+          font-size: 14px;
+          text-align: justify;
+          max-height: 0;
+          opacity: 0;
+          overflow: hidden;
+          transition: all 0.4s ease;
+        }
 
-.detalhes-box.visible {
-  max-height: 500px; /* suficiente para o conteúdo */
-  opacity: 1;
-}
+        .detalhes-box.visible {
+          max-height: 500px; /* suficiente para o conteúdo */
+          opacity: 1;
+        }
 
         .card p {
           margin: 4px 0;
@@ -233,21 +184,70 @@
             position: relative; /* necessário pro coração ficar dentro do card */
         }
 
-.btn-detalhes {
-  background: #6a5acd;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: transform 0.2s ease, background 0.3s;
-}
+        header {
+          font-family: "Nunito", sans-serif;
+          font-optical-sizing: auto;
+          font-weight: <weight>;
+          font-style: normal;
+          position: fixed;
+          top: 0; left: 0; width: 100%;
+          z-index: 150;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 14px 28px;
+          background: rgba(0,0,0,0.55);
+          backdrop-filter: blur(6px);
+          border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
 
-.btn-detalhes:hover {
-  background: #836fff;
-  transform: scale(1.05);
-}
+        header h1 {
+          color: #d46aff;
+          font-size: 1.8rem;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        header h1 i {
+          color: #b174ff;
+          font-size: 1.3rem;
+        }
+
+        header nav a { color: #fff; margin-left: 26px; text-decoration: none; font-size: 1.6rem; }
+        .header-actions a { background: linear-gradient(90deg,#7a42ff,#b174ff);
+         color: #fff;
+         padding: 8px 12px;
+         border-radius: 10px;
+         text-decoration: none; margin-left:8px;
+         font-weight: 600;
+         display:inline-block;
+
+         }
+
+        .logo-header {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .logo-header img {
+          width: 90px;
+          height: 90px;
+          border-radius: 8px;
+          object-fit: cover;
+        }
+
+        header h1 {
+          color: #d46aff;
+          font-size: 1.8rem;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        header h1 i {
+          color: #b174ff;
+          font-size: 1.3rem;
+        }
 
         .btn-like, .btn-dislike {
           padding: 8px 14px;
@@ -285,14 +285,31 @@
 </head>
 <body>
 <header th:if="${session.usuarioLogado != null}">
-    <h1>CineMatch</h1>
-    <nav>
-        <a href="/"><i class="fa-solid fa-house"></i></a>
-        <a href="/pesquisa"><i class="fa-solid fa-magnifying-glass"></i></a>
-        <a href="/chat"><i class="fa-solid fa-comment"></i></a>
-        <a href="/curtidos"><i class="fa-solid fa-heart"></i></a>
-        <a href="/perfil"><i class="fa-solid fa-user"></i></a>
-        <a href="/logout" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></a>
+    <div class="logo-header">
+        <img src="/img/cinematchlogo1-removebg-preview.png" alt="CineMatch Logo">
+        <h1>CineMatch</h1>
+    </div>
+    <nav class="nav-links">
+        <a href="/">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="/pesquisa">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>Pesquisar</span>
+        </a>
+        <a href="/chat">
+            <i class="fa-solid fa-comment"></i>
+            <span>Chat</span>
+        </a>
+        <a href="/curtidos">
+            <i class="fa-solid fa-heart"></i>
+            <span>Favoritos</span>
+        </a>
+        <a href="/perfil">
+            <i class="fa-solid fa-user"></i>
+            <span>Perfil</span>
+        </a>
     </nav>
 </header>
 
@@ -305,32 +322,124 @@
 </header>
 
 <main>
-    <h2>Pesquisar Filmes 🔎</h2>
+    <h2>🔍 Pesquisar Filmes</h2>
 
     <form class="barra-pesquisa" method="get" action="/pesquisa">
         <input type="text" name="q" placeholder="Digite o nome do filme..." th:value="${query}">
         <button type="submit">Buscar</button>
     </form>
 
-    <section th:if="${session.usuarioLogado != null}" class="catalogo" >
+    <section th:if="${session.usuarioLogado != null}" class="catalogo" id="catalogo">
         <div th:each="filme : ${filmes}" class="card">
             <img th:src="${filme.imagem}" alt="Poster do filme" loading="lazy">
-            <h3 th:text="${filme.titulo}"></h3>
-            <p class = "gen" th:text="${filme.genero}"></p>
-
+            <h3 th:text="${filme.titulo}">Título</h3>
+            <p th:text="${filme.genero}">Gênero</p>
             <div class="botoes">
-                <button th:data-id="${filme.imdbId}"
-                        th:data-titulo="${filme.titulo}"
-                        th:data-imagem="${filme.imagem}"
-                        th:data-genero="${filme.genero}" class="btn-favoritar" onclick="favoritarFilme(this)">
+                <button th:data-id="${filme.imdbId}" th:data-titulo="${filme.titulo}"
+                        th:data-imagem="${filme.imagem}" th:data-genero="${filme.genero}"
+                        class="btn-favoritar" onclick="favoritarFilme(this)">
                     <i class="fa-solid fa-heart"></i> Favoritar
+                </button>
+
+                <button th:data-id="${filme.imdbId}" th:data-titulo="${filme.titulo}"
+                        th:data-imagem="${filme.imagem}" th:data-genero="${filme.genero}"
+                        class="btn-salvar" onclick="salvarFilme(this)">
+                    <i class="fa-solid fa-bookmark"></i> Salvar
                 </button>
             </div>
         </div>
     </section>
 </main>
 
+<script src="https://kit.fontawesome.com/a2e0e6c6c1.js" crossorigin="anonymous"></script>
+
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+  // ===== BOTÃO "EXPLORAR AGORA" =====
+  const botaoExplorar = document.getElementById("btnExplorar");
+  if (botaoExplorar) {
+    botaoExplorar.addEventListener("click", function(e) {
+      e.preventDefault();
+
+      const secaoCatalogo = document.getElementById("catalogo");
+      if (!secaoCatalogo) {
+        console.warn("Seção #catalogo não encontrada");
+        return;
+      }
+
+      const header = document.querySelector("header");
+      const headerAltura = header ? header.offsetHeight : 0;
+
+      const destino = secaoCatalogo.getBoundingClientRect().top + window.scrollY - headerAltura - 12;
+      window.scrollTo({ top: destino, behavior: "smooth" });
+    });
+  }
+
+  // ===== FAVORITAR FILME =====
+  window.favoritarFilme = async function(botao) {
+    const imdbId = botao.getAttribute("data-id");
+    const titulo = botao.getAttribute("data-titulo");
+    const imagem = botao.getAttribute("data-imagem");
+    const genero = botao.getAttribute("data-genero");
+
+    try {
+      const resposta = await fetch("/favoritar", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `imdbId=${encodeURIComponent(imdbId)}&titulo=${encodeURIComponent(titulo)}&imagem=${encodeURIComponent(imagem)}&genero=${encodeURIComponent(genero)}`
+      });
+
+      const resultado = await resposta.text();
+
+      if (resultado === "ADICIONADO") {
+        botao.classList.add("favoritado");
+        botao.innerHTML = '<i class="fa-solid fa-heart-circle-check"></i> Favoritado';
+      } else if (resultado === "REMOVIDO") {
+        botao.classList.remove("favoritado");
+        botao.innerHTML = '<i class="fa-solid fa-heart"></i> Favoritar';
+      } else if (resultado.startsWith("ERRO")) {
+        alert("Você precisa estar logado para favoritar filmes.");
+      }
+    } catch (erro) {
+      console.error("Erro ao favoritar:", erro);
+      alert("Ocorreu um erro ao tentar favoritar o filme.");
+    }
+  };
+});
+
+    window.salvarFilme = async function(botao) {
+    const imdbId = botao.getAttribute("data-id");
+    const titulo = botao.getAttribute("data-titulo");
+    const imagem = botao.getAttribute("data-imagem");
+    const genero = botao.getAttribute("data-genero");
+
+    try {
+        const resposta = await fetch("/perfil/salvarFilme", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `imdbId=${encodeURIComponent(imdbId)}&titulo=${encodeURIComponent(titulo)}&imagem=${encodeURIComponent(imagem)}&genero=${encodeURIComponent(genero)}`
+        });
+
+        const resultado = await resposta.text();
+
+        if (resultado === "ADICIONADO") {
+            botao.classList.add("salvo");
+            botao.innerHTML = '<i class="fa-solid fa-bookmark-circle-check"></i> Salvo';
+        } else if (resultado === "REMOVIDO") {
+            botao.classList.remove("salvo");
+            botao.innerHTML = '<i class="fa-solid fa-bookmark"></i> Salvar';
+        } else if (resultado === "LIMITE") {
+            alert("Você já salvou o máximo de 10 filmes!");
+        } else if (resultado === "ERRO_LOGIN") {
+            alert("Você precisa estar logado para salvar filmes.");
+        }
+    } catch (erro) {
+        console.error("Erro ao salvar filme:", erro);
+        alert("Erro ao salvar filme.");
+    }
+};
+
     function mostrarDetalhes(imdbId, botao) {
         const box = document.getElementById("detalhes-" + imdbId);
         const descEl = document.getElementById("descricao-" + imdbId);

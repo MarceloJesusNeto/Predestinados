@@ -116,18 +116,11 @@ public class HomeController {
         return "chat";
     }
 
-    @GetMapping("/perfil")
-    public String perfil(HttpSession session, Model model) {
-        if (session.getAttribute("usuarioLogado") == null) {
-            model.addAttribute("erro", "Você precisa estar logado para ver seu perfil.");
-            return "login";
-        }
-        return "perfil";
-    }
-
     @GetMapping("/detalhes/{imdbId}")
     @ResponseBody
     public Filme getDetalhes(@PathVariable String imdbId) {
         return imdbService.buscarDetalhes(imdbId);
     }
+
+    // metodo de listar mais filmes faltando
 }

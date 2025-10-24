@@ -10,7 +10,7 @@ import java.util.*;
 
 @Service
 public class ImdbService {
-    private static final String API_KEY = "3f7558c4";
+    private static final String API_KEY = "bbb4983";
     private static final String SEARCH_URL = "https://www.omdbapi.com/?apikey=" + API_KEY + "&s=";
     private static final String DETAIL_URL = "https://www.omdbapi.com/?apikey=" + API_KEY + "&i=";
 

@@ -5,19 +5,38 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CineMatch - Chat</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="/css/home.css">
     <link rel="shortcut icon" href="/img/cinematchlogo1-removebg-preview (1).png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
 </head>
 <body>
 <header th:if="${session.usuarioLogado != null}">
-    <h1>CineMatch</h1>
-    <nav>
-        <a href="/"><i class="fa-solid fa-house"></i></a>
-        <a href="/pesquisa"><i class="fa-solid fa-magnifying-glass"></i></a>
-        <a href="/chat"><i class="fa-solid fa-comment"></i></a>
-        <a href="/curtidos"><i class="fa-solid fa-heart"></i></a>
-        <a href="/perfil"><i class="fa-solid fa-user"></i></a>
-        <a href="/logout" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></a>
+    <div class="logo-header">
+        <img src="/img/cinematchlogo1-removebg-preview.png" alt="CineMatch Logo">
+        <h1>CineMatch</h1>
+    </div>
+    <nav class="nav-links">
+        <a href="/">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="/pesquisa">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>Pesquisar</span>
+        </a>
+        <a href="/chat">
+            <i class="fa-solid fa-comment"></i>
+            <span>Chat</span>
+        </a>
+        <a href="/curtidos">
+            <i class="fa-solid fa-heart"></i>
+            <span>Favoritos</span>
+        </a>
+        <a href="/perfil">
+            <i class="fa-solid fa-user"></i>
+            <span>Perfil</span>
+        </a>
     </nav>
 </header>
 

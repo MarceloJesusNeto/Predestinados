@@ -4,13 +4,24 @@
     <meta charset="UTF-8">
     <title>CineMatch - Curtidos</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="/css/home.css">
     <link rel="shortcut icon" href="/img/cinematchlogo1-removebg-preview (1).png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
     <style>
         body {linear-gradient(180deg, rgba(13, 13, 15, 0.02), rgba(13, 13, 15, 0.05)); color: white; text-align: center; }
 
         section{
         background: linear-gradient(180deg, rgba(13, 13, 15, 0.02), rgba(13, 13, 15, 0.05));
+         font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+        margin-top:8%;
+        }
+
+        section h2{
+        font-size: 33px;
         }
 
         #lista-curtidos {
@@ -65,7 +76,7 @@
           cursor: pointer;
           transition: all 0.25s ease;
           box-shadow: 0 0 5px rgba(122, 66, 255, 0.2);
-          margin-left: 30px;
+          margin-left: 0px;
 
         }
 
@@ -107,14 +118,31 @@
 <body>
 
 <header th:if="${session.usuarioLogado != null}">
-    <h1>CineMatch</h1>
-    <nav>
-        <a href="/"><i class="fa-solid fa-house"></i></a>
-        <a href="/pesquisa"><i class="fa-solid fa-magnifying-glass"></i></a>
-        <a href="/chat"><i class="fa-solid fa-comment"></i></a>
-        <a href="/curtidos"><i class="fa-solid fa-heart"></i></a>
-        <a href="/perfil"><i class="fa-solid fa-user"></i></a>
-        <a href="/logout" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></a>
+    <div class="logo-header">
+        <img src="/img/cinematchlogo1-removebg-preview.png" alt="CineMatch Logo">
+        <h1>CineMatch</h1>
+    </div>
+    <nav class="nav-links">
+        <a href="/">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="/pesquisa">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>Pesquisar</span>
+        </a>
+        <a href="/chat">
+            <i class="fa-solid fa-comment"></i>
+            <span>Chat</span>
+        </a>
+        <a href="/curtidos">
+            <i class="fa-solid fa-heart"></i>
+            <span>Favoritos</span>
+        </a>
+        <a href="/perfil">
+            <i class="fa-solid fa-user"></i>
+            <span>Perfil</span>
+        </a>
     </nav>
 </header>
 
@@ -127,10 +155,10 @@
 </header>
 
 <section>
-    <h2>Filmes que você curtiu ❤️</h2>
+    <h2>❤️ Filmes que você curtiu:</h2>
 
     <div id="lista-curtidos">
-        <div th:each="filme : ${filmesCurtidos}" class="filme-card">
+        <div th:each="filme : ${filmesCurtidos}" class="card">
             <img th:src="${filme.imagem}" th:alt="${filme.titulo}" class="poster">
             <h3 th:text="${filme.titulo}"></h3>
             <p th:text="${filme.genero}"></p>
@@ -150,7 +178,7 @@
 
 <script>
     async function desfavoritarFilme(botao) {
-      const card = botao.closest(".filme-card");
+      const card = botao.closest(".card");
       const imdbId = botao.dataset.id;
       const titulo = botao.dataset.titulo;
       const imagem = botao.dataset.imagem;
