@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
 </head>
 <body>
-<header th:if="${session.usuarioLogado != null}">
+<header th:if="${session != null and session.usuarioLogado != null}">
     <div class="logo-header">
         <img src="/img/cinematchlogo1-removebg-preview.png" alt="CineMatch Logo">
         <h1>CineMatch</h1>
@@ -39,7 +39,7 @@
     </nav>
 </header>
 
-<header th:if="${session.usuarioLogado == null}">
+<header  th:if="${session == null or session.usuarioLogado == null}">
     <div class="logo-header">
         <img src="/img/cinematchlogo1-removebg-preview.png" alt="CineMatch Logo">
         <h1>CineMatch</h1>
@@ -52,7 +52,7 @@
 
 <main>
 
-    <section class="hero" id="inicio" th:if="${session.usuarioLogado == null}">
+    <section class="hero" id="inicio"  th:if="${session == null or session.usuarioLogado == null}">
         <div class="hero-bg"></div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
@@ -86,9 +86,10 @@
     </section>
 
     <!-- CATÁLOGO original -->
-    <section th:if="${session.usuarioLogado != null}" class="catalogo" id="catalogo">
+    <section th:if="${session != null and session.usuarioLogado != null}" class="catalogo" id="catalogo">
         <div th:each="filme : ${filmes}" class="card">
-            <img th:src="${filme.imagem}" alt="Poster do filme" loading="lazy">
+            <img th:src="${#strings.replace(filme.imagem, '._V1_', '._V1_UX200_')}"
+                 alt="Poster do filme" loading="lazy">
             <h3 th:text="${filme.titulo}">Título</h3>
             <p th:text="${filme.genero}">Gênero</p>
             <div class="botoes">
@@ -97,17 +98,21 @@
                         class="btn-favoritar" onclick="favoritarFilme(this)">
                     <i class="fa-solid fa-heart"></i> Favoritar
                 </button>
-
                 <button th:data-id="${filme.imdbId}" th:data-titulo="${filme.titulo}"
                         th:data-imagem="${filme.imagem}" th:data-genero="${filme.genero}"
-                        class="btn-salvar" onclick="salvarFilme(this)">
+                        class="btn-salvar" onclick="salvarFilme('tt1234567', 'Matrix', 'https://imageurl.jpg', 'Ação', this)">
                     <i class="fa-solid fa-bookmark"></i> Salvar
                 </button>
             </div>
         </div>
+
     </section>
 
-    <section th:if="${session.usuarioLogado == null}" class="catalogo">
+    <div th:if="${session != null and session.usuarioLogado != null}" class="carregar-mais-container" style="text-align:center; margin:40px 0;">
+        <button id="btnCarregarMais" class="btn-carregar-mais">Carregar mais</button>
+    </div>
+
+    <section  th:if="${session == null or session.usuarioLogado == null}" class="catalogo">
         <div th:each="filme : ${filmes}" class="card">
             <img th:src="${filme.imagem}" alt="Poster do filme" loading="lazy">
             <h3 th:text="${filme.titulo}">Título</h3>
@@ -115,6 +120,30 @@
         </div>
     </section>
 </main>
+
+<div id="modalFilme" class="modal">
+    <div class="modal-content">
+        <span class="fechar">&times;</span>
+        <div class="modal-poster">
+            <img id="posterFilme" src="" alt="Poster do filme">
+        </div>
+        <div class="modal-info">
+            <h2 id="tituloFilme"></h2>
+            <p id="descricaoFilme"></p>
+            <div class="nota-filme">
+                <i class="fa-solid fa-star"></i> <span id="notaFilme">—</span>
+            </div>
+            <div class="botoes-modal">
+                <button id="btnFavoritarModal" class="btn-favoritar">
+                    <i class="fa-solid fa-heart"></i> Favoritar
+                </button>
+                <button id="btnSalvarModal" class="btn-salvar">
+                    <i class="fa-solid fa-bookmark"></i> Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <footer class="footer">
     <div class="footer-container">
@@ -147,94 +176,261 @@
     </div>
 </footer>
 
+<div id="loading" class="loading">
+    <div class="spinner"></div>
+</div>
+
 <script src="https://kit.fontawesome.com/a2e0e6c6c1.js" crossorigin="anonymous"></script>
 
+<script src="/js/filmes.js"></script>
+
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    let offset = 27;
 
-  // ===== BOTÃO "EXPLORAR AGORA" =====
-  const botaoExplorar = document.getElementById("btnExplorar");
-  if (botaoExplorar) {
-    botaoExplorar.addEventListener("click", function(e) {
-      e.preventDefault();
-
-      const secaoCatalogo = document.getElementById("catalogo");
-      if (!secaoCatalogo) {
-        console.warn("Seção #catalogo não encontrada");
-        return;
-      }
-
-      const header = document.querySelector("header");
-      const headerAltura = header ? header.offsetHeight : 0;
-
-      const destino = secaoCatalogo.getBoundingClientRect().top + window.scrollY - headerAltura - 12;
-      window.scrollTo({ top: destino, behavior: "smooth" });
-    });
-  }
-
-  // ===== FAVORITAR FILME =====
-  window.favoritarFilme = async function(botao) {
-    const imdbId = botao.getAttribute("data-id");
-    const titulo = botao.getAttribute("data-titulo");
-    const imagem = botao.getAttribute("data-imagem");
-    const genero = botao.getAttribute("data-genero");
+document.getElementById("btnCarregarMais").addEventListener("click", async () => {
+    const btn = document.getElementById("btnCarregarMais");
+    btn.disabled = true;
+    btn.textContent = "Carregando...";
 
     try {
-      const resposta = await fetch("/favoritar", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `imdbId=${encodeURIComponent(imdbId)}&titulo=${encodeURIComponent(titulo)}&imagem=${encodeURIComponent(imagem)}&genero=${encodeURIComponent(genero)}`
-      });
+        const response = await fetch(`/filmes/mais?offset=${offset}`);
+        const novosFilmes = await response.json();
 
-      const resultado = await resposta.text();
+        if (novosFilmes.length === 0) {
+            btn.textContent = "Não há mais filmes";
+            btn.disabled = true;
+            return;
+        }
 
-      if (resultado === "ADICIONADO") {
-        botao.classList.add("favoritado");
-        botao.innerHTML = '<i class="fa-solid fa-heart-circle-check"></i> Favoritado';
-      } else if (resultado === "REMOVIDO") {
-        botao.classList.remove("favoritado");
-        botao.innerHTML = '<i class="fa-solid fa-heart"></i> Favoritar';
-      } else if (resultado.startsWith("ERRO")) {
-        alert("Você precisa estar logado para favoritar filmes.");
-      }
-    } catch (erro) {
-      console.error("Erro ao favoritar:", erro);
-      alert("Ocorreu um erro ao tentar favoritar o filme.");
-    }
-  };
-});
+        const catalogo = document.querySelector(".catalogo");
 
-    window.salvarFilme = async function(botao) {
-    const imdbId = botao.getAttribute("data-id");
-    const titulo = botao.getAttribute("data-titulo");
-    const imagem = botao.getAttribute("data-imagem");
-    const genero = botao.getAttribute("data-genero");
-
-    try {
-        const resposta = await fetch("/perfil/salvarFilme", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `imdbId=${encodeURIComponent(imdbId)}&titulo=${encodeURIComponent(titulo)}&imagem=${encodeURIComponent(imagem)}&genero=${encodeURIComponent(genero)}`
+        novosFilmes.forEach(filme => {
+            const card = document.createElement("div");
+            card.classList.add("card");
+            card.innerHTML = `
+                <img src="${filme.imagem}" alt="Poster do filme" loading="lazy">
+                <h3>${filme.titulo}</h3>
+                <p>${filme.genero}</p>
+                <div class="botoes">
+                    <button class="btn-favoritar" data-id="${filme.imdbId}" data-titulo="${filme.titulo}" data-imagem="${filme.imagem}" data-genero="${filme.genero}" onclick="favoritarFilme(this)">
+                        <i class="fa-solid fa-heart"></i> Favoritar
+                    </button>
+                    <button class="btn-salvar" data-id="${filme.imdbId}" data-titulo="${filme.titulo}" data-imagem="${filme.imagem}" data-genero="${filme.genero}" onclick="salvarFilme(this)">
+                        <i class="fa-solid fa-bookmark"></i> Salvar
+                    </button>
+                </div>
+            `;
+            catalogo.appendChild(card);
         });
 
-        const resultado = await resposta.text();
+        offset += novosFilmes.length;
+        btn.textContent = "Carregar mais";
+        btn.disabled = false;
 
-        if (resultado === "ADICIONADO") {
-            botao.classList.add("salvo");
-            botao.innerHTML = '<i class="fa-solid fa-bookmark-circle-check"></i> Salvo';
-        } else if (resultado === "REMOVIDO") {
-            botao.classList.remove("salvo");
-            botao.innerHTML = '<i class="fa-solid fa-bookmark"></i> Salvar';
-        } else if (resultado === "LIMITE") {
-            alert("Você já salvou o máximo de 10 filmes!");
-        } else if (resultado === "ERRO_LOGIN") {
-            alert("Você precisa estar logado para salvar filmes.");
-        }
-    } catch (erro) {
-        console.error("Erro ao salvar filme:", erro);
-        alert("Erro ao salvar filme.");
+    } catch (error) {
+        console.error("Erro ao carregar mais filmes:", error);
+        btn.textContent = "Erro ao carregar";
     }
-};
+});
+document.addEventListener("DOMContentLoaded", async function () {
+
+     // ========================
+     // VARIÁVEIS E FUNÇÕES BASE
+     // ========================
+     const modal = document.getElementById("modalFilme");
+     const poster = document.getElementById("posterFilme");
+     const titulo = document.getElementById("tituloFilme");
+     const descricao = document.getElementById("descricaoFilme");
+     const nota = document.getElementById("notaFilme");
+     const fechar = modal.querySelector(".fechar");
+     const btnFavoritarModal = document.getElementById("btnFavoritarModal");
+     const btnSalvarModal = document.getElementById("btnSalvarModal");
+     let filmeAtual = null;
+     let favoritosIds = [];
+     let salvosIds = [];
+
+     // ========================
+     // FUNÇÕES DE FAVORITAR/SALVAR
+     // ========================
+     window.favoritarFilme = async function (botao) {
+       const imdbId = botao.dataset.id;
+       const titulo = botao.dataset.titulo;
+       const imagem = botao.dataset.imagem;
+       const genero = botao.dataset.genero;
+
+       try {
+         const resposta = await fetch("/favoritar", {
+           method: "POST",
+           headers: { "Content-Type": "application/x-www-form-urlencoded" },
+           body: `imdbId=${encodeURIComponent(imdbId)}&titulo=${encodeURIComponent(titulo)}&imagem=${encodeURIComponent(imagem)}&genero=${encodeURIComponent(genero)}`
+         });
+
+         const resultado = await resposta.text();
+
+         if (resultado === "ADICIONADO") {
+           favoritosIds.push(imdbId);
+           atualizarEstadoBotaoFavorito(imdbId, true);
+         } else if (resultado === "REMOVIDO") {
+           favoritosIds = favoritosIds.filter(id => id !== imdbId);
+           atualizarEstadoBotaoFavorito(imdbId, false);
+         }
+       } catch (erro) {
+         console.error("Erro ao favoritar:", erro);
+       }
+     };
+
+     window.salvarFilme = async function (botao) {
+       const imdbId = botao.getAttribute("data-id") || "";
+       const titulo = botao.getAttribute("data-titulo") || "Título não disponível";
+       const imagem = botao.getAttribute("data-imagem") || "/img/placeholder.jpg";
+       const genero = botao.getAttribute("data-genero") || "Desconhecido";
+
+       try {
+         const resposta = await fetch("/perfil/salvarFilme", {
+           method: "POST",
+           headers: { "Content-Type": "application/x-www-form-urlencoded" },
+           body: new URLSearchParams({
+             imdbId: imdbId,
+             titulo: titulo,
+             imagem: imagem,
+             genero: genero
+           })
+         });
+
+         const resultado = await resposta.text();
+
+         if (resultado === "ADICIONADO") {
+           console.log(`✅ Filme salvo: ${titulo}`);
+         } else if (resultado === "REMOVIDO") {
+           console.log(`❌ Filme removido: ${titulo}`);
+         } else {
+           console.warn("⚠️ Resposta inesperada:", resultado);
+         }
+       } catch (erro) {
+         console.error("Erro ao salvar:", erro);
+       }
+     };
+
+     // ========================
+     // FUNÇÕES DE ATUALIZAÇÃO VISUAL
+     // ========================
+     function atualizarEstadoBotaoFavorito(imdbId, ativo) {
+       document.querySelectorAll(`[data-id="${imdbId}"].btn-favoritar`).forEach(btn => {
+         if (ativo) {
+           btn.classList.add("favoritado");
+           btn.innerHTML = '<i class="fa-solid fa-heart-circle-check"></i> Favoritado';
+         } else {
+           btn.classList.remove("favoritado");
+           btn.innerHTML = '<i class="fa-solid fa-heart"></i> Favoritar';
+         }
+       });
+     }
+
+     function atualizarEstadoBotaoSalvar(imdbId, ativo) {
+       document.querySelectorAll(`[data-id="${imdbId}"].btn-salvar`).forEach(btn => {
+         if (ativo) {
+           btn.classList.add("salvo");
+           btn.innerHTML = '<i class="fa-solid fa-bookmark-circle-check"></i> Salvo';
+         } else {
+           btn.classList.remove("salvo");
+           btn.innerHTML = '<i class="fa-solid fa-bookmark"></i> Salvar';
+         }
+       });
+     }
+
+     // ========================
+     // CARREGA ESTADOS AO ENTRAR NA PÁGINA
+     // ========================
+     try {
+       const [respFav, respSalvo] = await Promise.all([
+         fetch("/favoritos/ids"),
+         fetch("/perfil/salvos/ids")
+       ]);
+
+       if (respFav.ok) favoritosIds = await respFav.json();
+       if (respSalvo.ok) salvosIds = await respSalvo.json();
+
+       favoritosIds.forEach(id => atualizarEstadoBotaoFavorito(id, true));
+       salvosIds.forEach(id => atualizarEstadoBotaoSalvar(id, true));
+     } catch (e) {
+       console.warn("Usuário não logado ou erro ao carregar favoritos/salvos:", e);
+     }
+
+     // ========================
+     // ABRE O MODAL AO CLICAR NO CARD
+     // ========================
+     document.querySelectorAll(".card").forEach(card => {
+       card.addEventListener("click", async (e) => {
+         if (e.target.closest(".btn-favoritar") || e.target.closest(".btn-salvar")) return;
+
+         const imdbId = card.querySelector(".btn-favoritar")?.dataset.id;
+         if (!imdbId) return;
+
+         try {
+           const resposta = await fetch(`/detalhes/${imdbId}`);
+           const filme = await resposta.json();
+           filmeAtual = filme;
+
+           poster.src = filme.imagem || card.querySelector("img").src;
+           titulo.textContent = filme.titulo || "Título não disponível";
+           descricao.textContent = filme.descricao || "Descrição não disponível.";
+           nota.textContent = filme.nota || "—";
+
+           // Atualiza dados dos botões do modal
+           [btnFavoritarModal, btnSalvarModal].forEach(btn => {
+             btn.dataset.id = imdbId;
+             btn.dataset.titulo = filme.titulo;
+             btn.dataset.imagem = filme.imagem;
+             btn.dataset.genero = filme.genero;
+           });
+
+           // Aplica o estado visual atual
+           atualizarEstadoBotaoFavorito(imdbId, favoritosIds.includes(imdbId));
+           atualizarEstadoBotaoSalvar(imdbId, salvosIds.includes(imdbId));
+
+           modal.style.display = "flex";
+           document.body.classList.add("modal-ativo");
+         } catch (e) {
+           console.error("Erro ao buscar detalhes:", e);
+         }
+       });
+     });
+
+     // ========================
+     // BOTÕES DENTRO DO MODAL
+     // ========================
+     btnFavoritarModal.addEventListener("click", (e) => {
+       e.stopPropagation();
+       favoritarFilme(btnFavoritarModal);
+     });
+
+     btnSalvarModal.addEventListener("click", (e) => {
+       e.stopPropagation();
+       salvarFilme(btnSalvarModal);
+     });
+
+     // Fecha o modal
+     fechar.addEventListener("click", () => {
+       modal.style.display = "none";
+       document.body.classList.remove("modal-ativo");
+     });
+
+     modal.addEventListener("click", e => {
+       if (e.target === modal) {
+         modal.style.display = "none";
+         document.body.classList.remove("modal-ativo");
+       }
+     });
+   });
+
+   window.addEventListener("load", () => {
+     document.getElementById("loading").style.display = "none";
+
+     });
+
+
+
+
 </script>
 </body>
 </html>

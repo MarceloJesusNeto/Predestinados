@@ -1,3 +1,5 @@
+
+
 package Cinemach.cinemach.service;
 
 import Cinemach.cinemach.model.Filme;
@@ -17,76 +19,65 @@ public class ImdbService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     private static final List<String> KEYWORDS = Arrays.asList(
-            "love","life","death","dark","dream","power","world","future","past","legend","secret","lost","return",
-            "day","night","moon","sun","star","ocean","fire","king","queen","war","battle","hero","villain",
-            "ghost","soul","monster","alien","robot","magic","space","universe","vampire","zombie","romance"
+            "love","life","death","dream","power","world","future","legend",
+            "night","sun","moon","fire","war","battle","hero","villain",
+            "ghost","soul","magic","space","vampire","zombie","romance"
     );
 
+
+    private List<Filme> cacheFilmesAleatorios = new ArrayList<>();
+    private long cacheTimestamp = 0;
+    private static final long CACHE_TTL = 1000L * 60 * 60; // 1h
+
     private String reduzirPoster(String posterUrl) {
-        if (posterUrl == null || posterUrl.equals("N/A")) return posterUrl;
+        if (posterUrl == null || posterUrl.equals("N/A")) return "/img/placeholder.jpg";
         return posterUrl.replaceAll("\\._V1.*\\.jpg", "._V1_SX300.jpg");
     }
 
-    public List<Filme> buscarPorTitulo(String titulo) {
-        try {
-            String resposta = restTemplate.getForObject(SEARCH_URL + titulo, String.class);
-            JSONObject json = new JSONObject(resposta);
-
-            List<Filme> filmes = new ArrayList<>();
-            if (json.has("Search")) {
-                JSONArray results = json.getJSONArray("Search");
-
-                for (int i = 0; i < results.length(); i++) {
-                    JSONObject f = results.getJSONObject(i);
-                    String imdbId = f.optString("imdbID", "");
-
-                    Filme detalhes = buscarDetalhes(imdbId);
-                    if (detalhes != null) {
-                        filmes.add(detalhes);
-                    }
-                }
-            }
-
-            return filmes;
-        } catch (Exception e) {
-            System.err.println("Erro buscarPorTitulo: " + e.getMessage());
-            return Collections.emptyList();
-        }
-    }
-
-
     public List<Filme> buscarFilmesAleatorios() {
         List<Filme> filmes = new ArrayList<>();
-        try {
-            Collections.shuffle(KEYWORDS);
-            List<String> escolhidos = KEYWORDS.subList(0, 22);
+        Set<String> titulosUsados = new HashSet<>();
 
-            for (String palavra : escolhidos) {
+        try {
+            List<String> palavrasMisturadas = new ArrayList<>(KEYWORDS);
+            Collections.shuffle(palavrasMisturadas);
+
+            for (String palavra : palavrasMisturadas) {
                 String resposta = restTemplate.getForObject(SEARCH_URL + palavra, String.class);
                 JSONObject json = new JSONObject(resposta);
 
                 if (json.has("Search")) {
                     JSONArray results = json.getJSONArray("Search");
 
-                    for (int i = 0; i < results.length(); i++) {
+                    // agora pega até 5 filmes por palavra-chave
+                    for (int i = 0; i < Math.min(results.length(), 5); i++) {
                         JSONObject f = results.getJSONObject(i);
                         String imdbId = f.optString("imdbID", "");
 
                         Filme detalhes = buscarDetalhes(imdbId);
                         if (detalhes != null) {
-                            filmes.add(detalhes);
+                            String tituloLower = detalhes.getTitulo().toLowerCase();
+
+                            if (!titulosUsados.contains(tituloLower)) {
+                                filmes.add(detalhes);
+                                titulosUsados.add(tituloLower);
+                            }
                         }
-                        if (filmes.size() >= 33) break;
+
+                        // agora gera até 81 filmes no cache
+                        if (filmes.size() >= 81) break;
                     }
                 }
-                if (filmes.size() >= 33) break;
+
+                if (filmes.size() >= 81) break;
             }
+
+            Collections.shuffle(filmes);
         } catch (Exception e) {
             System.err.println("Erro buscarFilmesAleatorios: " + e.getMessage());
         }
         return filmes;
     }
-
 
     public Filme buscarDetalhes(String imdbId) {
         try {
@@ -104,6 +95,28 @@ public class ImdbService {
         } catch (Exception e) {
             System.err.println("Erro buscarDetalhes: " + e.getMessage());
             return null;
+        }
+    }
+
+    public List<Filme> buscarPorTitulo(String titulo) {
+        try {
+            String resposta = restTemplate.getForObject(SEARCH_URL + titulo, String.class);
+            JSONObject json = new JSONObject(resposta);
+
+            List<Filme> filmes = new ArrayList<>();
+            if (json.has("Search")) {
+                JSONArray results = json.getJSONArray("Search");
+                for (int i = 0; i < results.length(); i++) {
+                    JSONObject f = results.getJSONObject(i);
+                    String imdbId = f.optString("imdbID", "");
+                    Filme detalhes = buscarDetalhes(imdbId);
+                    if (detalhes != null) filmes.add(detalhes);
+                }
+            }
+            return filmes;
+        } catch (Exception e) {
+            System.err.println("Erro buscarPorTitulo: " + e.getMessage());
+            return Collections.emptyList();
         }
     }
 }

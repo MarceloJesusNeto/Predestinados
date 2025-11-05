@@ -588,3 +588,194 @@ button,
     .footer-links a:hover {
       color: #e50914;
     }
+
+    /* ==== MODAL DETALHE DE FILME ==== */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6); /* desfoque mais suave */
+      backdrop-filter: blur(6px);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    /* ==== CONTEÚDO ==== */
+    .modal-content {
+      display: flex;
+      flex-direction: row;
+      align-items: center; /* centraliza verticalmente */
+      gap: 40px;
+      background: rgba(25, 25, 35, 0.9);
+      backdrop-filter: blur(18px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 22px;
+      padding: 40px;
+      width: 90%;
+      max-width: 1100px;
+      color: #f2f2f2;
+      box-shadow: 0 0 45px rgba(0, 0, 0, 0.6);
+      position: relative;
+      animation: zoomIn 0.3s ease;
+    }
+
+    @keyframes zoomIn {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+
+.btn-carregar-mais {
+    background-color: #ff005c;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.btn-carregar-mais:hover {
+    background-color: #e60050;
+}
+
+
+    /*load*/
+    .loading {
+      position: fixed;
+      inset: 0;
+      background: #0b0014;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .spinner {
+      border: 5px solid rgba(255,255,255,0.3);
+      border-top: 5px solid #ff004c;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* ==== POSTER ==== */
+    .modal-poster img {
+      width: 380px;  /* aumentado */
+      height: 550px;
+      border-radius: 16px;
+      object-fit: cover;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-poster img:hover {
+      transform: scale(1.03);
+    }
+
+    /* ==== INFO ==== */
+    .modal-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* tudo centralizado horizontalmente */
+      justify-content: center; /* centralizado verticalmente */
+      text-align: center; /* textos centralizados */
+    }
+
+    .modal-info h2 {
+      color: #ffffff;
+      font-size: 2.4rem; /* título maior */
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .modal-info p {
+      color: #d0d0d0;
+      line-height: 1.5;
+      font-size: 1.05rem;
+      max-height: 250px;
+      overflow-y: auto;
+      margin-bottom: 25px;
+      text-align: center;
+      padding: 0 10px;
+    }
+
+    .nota-filme {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: #ffd700;
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+    }
+
+    /* ==== BOTÕES ==== */
+    .botoes-modal {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .modal .btn-favoritar,
+    .modal .btn-salvar {
+      background: linear-gradient(90deg, #9f45ff, #7b2cff);
+      border: none;
+      color: #fff;
+      padding: 12px 26px;
+      border-radius: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      min-width: 130px; /* garante largura igual */
+      height: 45px; /* altura uniforme */
+    }
+
+    .modal .btn-favoritar:hover,
+    .modal .btn-salvar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 14px rgba(127, 45, 255, 0.5);
+    }
+
+    .modal .btn-favoritar i,
+    .modal .btn-salvar i {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ==== FECHAR ==== */
+    .modal .fechar {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 28px;
+      color: #ccc;
+      cursor: pointer;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+    .modal .fechar:hover {
+      transform: scale(1.2);
+      color: #fff;
+    }
+
+    /* ==== DESFOQUE DO FUNDO ==== */
+    body.modal-ativo main,
+    body.modal-ativo header,
+    body.modal-ativo footer {
+      filter: blur(6px); /* mais leve */
+      pointer-events: none;
+      user-select: none;
+    }

@@ -1,21 +1,34 @@
 package Cinemach.cinemach.controller;
 
 import Cinemach.cinemach.model.Filme;
+import Cinemach.cinemach.model.FotoPerfil;
 import Cinemach.cinemach.model.Usuario;
+import Cinemach.cinemach.repository.FotoPerfilRepository;
 import Cinemach.cinemach.repository.UsuarioRepository;
 import Cinemach.cinemach.service.ImdbService;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 public class HomeController {
 
     private final ImdbService imdbService;
     private final UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private FotoPerfilRepository fotoPerfilRepository;
 
     public HomeController(ImdbService imdbService, UsuarioRepository usuarioRepository) {
         this.imdbService = imdbService;
@@ -36,48 +49,41 @@ public class HomeController {
     }
 
     @PostMapping("/registrar")
-    public String registrar(@ModelAttribute Usuario usuario,
-                            @RequestParam(value = "generos", required = false) String generos,
-                            Model model) {
-        try {
-            if (usuarioRepository.findByEmail(usuario.getEmail()) != null) {
-                model.addAttribute("erro", "Email já cadastrado!");
-                return "cadastro";
-            }
+    public String registrar(@ModelAttribute Usuario usuario, Model model) {
+        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
 
-            if (!usuario.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-                model.addAttribute("erro", "Digite um e-mail válido!");
-                return "cadastro";
-            }
+        FotoPerfil fotoPadrao = fotoPerfilRepository.findAll().stream()
+                .filter(f -> f.getNome().equalsIgnoreCase("Foto 1"))
+                .findFirst()
+                .orElse(null);
 
-            if (generos == null || generos.isBlank() || generos.split(",").length != 3) {
-                model.addAttribute("erro", "Escolha exatamente 3 gêneros favoritos!");
-                return "cadastro";
-            }
-
-            usuario.setGeneros(generos);
-            usuarioRepository.save(usuario);
-
-            model.addAttribute("msg", "Cadastro realizado com sucesso! Faça login.");
-            return "login";
-
-        } catch (Exception e) {
-            model.addAttribute("erro", "Erro ao cadastrar: " + e.getMessage());
-            return "cadastro";
+        if (fotoPadrao != null) {
+            usuario.setFotoPerfil(fotoPadrao);
         }
+
+        usuarioRepository.save(usuario);
+        return "redirect:/login";
     }
 
     @GetMapping("/")
     public String home(Model model, HttpSession session) {
-        List<Filme> todosFilmes = imdbService.buscarFilmesAleatorios();
-        session.setAttribute("filmesCache", todosFilmes);
 
-        int fim = Math.min(27, todosFilmes.size());
-        List<Filme> filmesPagina = todosFilmes.subList(0, fim);
+        List<Filme> filmesCache = (List<Filme>) session.getAttribute("filmesCache");
 
+        if (filmesCache == null || filmesCache.isEmpty()) {
+
+            filmesCache = imdbService.buscarFilmesAleatorios();
+            session.setAttribute("filmesCache", filmesCache);
+        }
+
+        // 27 filmes
+        int fim = Math.min(27, filmesCache.size());
+        List<Filme> filmesPagina = filmesCache.subList(0, fim);
+
+        model.addAttribute("usuarioLogado", session.getAttribute("usuarioLogado"));
         model.addAttribute("filmes", filmesPagina);
         model.addAttribute("quantidade", fim);
-        model.addAttribute("temMais", fim < todosFilmes.size());
+        model.addAttribute("temMais", fim < filmesCache.size());
 
         return "home";
     }
@@ -122,5 +128,33 @@ public class HomeController {
         return imdbService.buscarDetalhes(imdbId);
     }
 
-    // metodo de listar mais filmes faltando
+    @GetMapping("/filmes/mais")
+    @ResponseBody
+    public List<Filme> carregarMaisFilmes(HttpSession session) {
+        // Busca o cache atual, se houver
+        List<Filme> filmesCache = (List<Filme>) session.getAttribute("filmesCache");
+
+        // Se não existir, cria um novo cache
+        if (filmesCache == null) {
+            filmesCache = new ArrayList<>();
+        }
+
+        // Busca novos filmes do serviço
+        List<Filme> novos = imdbService.buscarFilmesAleatorios();
+
+        // Garante que não haja duplicados
+        Set<String> idsExistentes = filmesCache.stream()
+                .map(Filme::getImdbId)
+                .collect(Collectors.toSet());
+
+        List<Filme> novosUnicos = novos.stream()
+                .filter(f -> !idsExistentes.contains(f.getImdbId()))
+                .collect(Collectors.toList());
+
+        // Adiciona ao cache e retorna apenas 27
+        filmesCache.addAll(novosUnicos);
+        session.setAttribute("filmesCache", filmesCache);
+
+        return novosUnicos.stream().limit(27).collect(Collectors.toList());
+    }
 }

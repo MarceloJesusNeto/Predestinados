@@ -38,6 +38,7 @@
 
         main {
           padding: 120px;
+          margin-bottom: 100px;
         }
 
         h2 {
@@ -157,7 +158,7 @@
         .botoes {
           display: flex;
           justify-content: center;
-          gap: 12px;
+          gap: 0px;
           margin-top: auto;
         }
 
@@ -351,176 +352,63 @@
     </section>
 </main>
 
+<div id="modalFilme" class="modal">
+    <div class="modal-content">
+        <span class="fechar">&times;</span>
+        <div class="modal-poster">
+            <img id="posterFilme" src="" alt="Poster do filme">
+        </div>
+        <div class="modal-info">
+            <h2 id="tituloFilme"></h2>
+            <p id="descricaoFilme"></p>
+            <div class="nota-filme">
+                <i class="fa-solid fa-star"></i> <span id="notaFilme">—</span>
+            </div>
+            <div class="botoes-modal">
+                <button id="btnFavoritarModal" class="btn-favoritar">
+                    <i class="fa-solid fa-heart"></i> Favoritar
+                </button>
+                <button id="btnSalvarModal" class="btn-salvar">
+                    <i class="fa-solid fa-bookmark"></i> Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-col">
+            <img th:src="@{/img/cinematchlogo1-removebg-preview.png}" alt="Cinemach" class="footer-logo">
+            <p>Soluções de recomendação e descoberta de filmes personalizadas.</p>
+        </div>
+
+        <div class="footer-col">
+            <h4>Links Rápidos</h4>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/registrar">Pesquisar</a></li>
+                <li><a href="/registrar">Chat</a></li>
+                <li><a href="/registrar">Favoritos</a></li>
+                <li><a href="/registrar">Perfil</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4>Contato</h4>
+            <p><i class="fa-solid fa-location-dot"></i> Rua Exemplo, 123 - São Paulo, SP</p>
+            <p><i class="fa-solid fa-phone"></i> (11) 1234-5678</p>
+            <p><i class="fa-solid fa-envelope"></i> contato@cinematch.com.br</p>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>© 2025 Cinematch. Todos os direitos reservados.</p>
+    </div>
+</footer>
+
 <script src="https://kit.fontawesome.com/a2e0e6c6c1.js" crossorigin="anonymous"></script>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-
-  // ===== BOTÃO "EXPLORAR AGORA" =====
-  const botaoExplorar = document.getElementById("btnExplorar");
-  if (botaoExplorar) {
-    botaoExplorar.addEventListener("click", function(e) {
-      e.preventDefault();
-
-      const secaoCatalogo = document.getElementById("catalogo");
-      if (!secaoCatalogo) {
-        console.warn("Seção #catalogo não encontrada");
-        return;
-      }
-
-      const header = document.querySelector("header");
-      const headerAltura = header ? header.offsetHeight : 0;
-
-      const destino = secaoCatalogo.getBoundingClientRect().top + window.scrollY - headerAltura - 12;
-      window.scrollTo({ top: destino, behavior: "smooth" });
-    });
-  }
-
-  // ===== FAVORITAR FILME =====
-  window.favoritarFilme = async function(botao) {
-    const imdbId = botao.getAttribute("data-id");
-    const titulo = botao.getAttribute("data-titulo");
-    const imagem = botao.getAttribute("data-imagem");
-    const genero = botao.getAttribute("data-genero");
-
-    try {
-      const resposta = await fetch("/favoritar", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `imdbId=${encodeURIComponent(imdbId)}&titulo=${encodeURIComponent(titulo)}&imagem=${encodeURIComponent(imagem)}&genero=${encodeURIComponent(genero)}`
-      });
-
-      const resultado = await resposta.text();
-
-      if (resultado === "ADICIONADO") {
-        botao.classList.add("favoritado");
-        botao.innerHTML = '<i class="fa-solid fa-heart-circle-check"></i> Favoritado';
-      } else if (resultado === "REMOVIDO") {
-        botao.classList.remove("favoritado");
-        botao.innerHTML = '<i class="fa-solid fa-heart"></i> Favoritar';
-      } else if (resultado.startsWith("ERRO")) {
-        alert("Você precisa estar logado para favoritar filmes.");
-      }
-    } catch (erro) {
-      console.error("Erro ao favoritar:", erro);
-      alert("Ocorreu um erro ao tentar favoritar o filme.");
-    }
-  };
-});
-
-    window.salvarFilme = async function(botao) {
-    const imdbId = botao.getAttribute("data-id");
-    const titulo = botao.getAttribute("data-titulo");
-    const imagem = botao.getAttribute("data-imagem");
-    const genero = botao.getAttribute("data-genero");
-
-    try {
-        const resposta = await fetch("/perfil/salvarFilme", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `imdbId=${encodeURIComponent(imdbId)}&titulo=${encodeURIComponent(titulo)}&imagem=${encodeURIComponent(imagem)}&genero=${encodeURIComponent(genero)}`
-        });
-
-        const resultado = await resposta.text();
-
-        if (resultado === "ADICIONADO") {
-            botao.classList.add("salvo");
-            botao.innerHTML = '<i class="fa-solid fa-bookmark-circle-check"></i> Salvo';
-        } else if (resultado === "REMOVIDO") {
-            botao.classList.remove("salvo");
-            botao.innerHTML = '<i class="fa-solid fa-bookmark"></i> Salvar';
-        } else if (resultado === "LIMITE") {
-            alert("Você já salvou o máximo de 10 filmes!");
-        } else if (resultado === "ERRO_LOGIN") {
-            alert("Você precisa estar logado para salvar filmes.");
-        }
-    } catch (erro) {
-        console.error("Erro ao salvar filme:", erro);
-        alert("Erro ao salvar filme.");
-    }
-};
-
-    function mostrarDetalhes(imdbId, botao) {
-        const box = document.getElementById("detalhes-" + imdbId);
-        const descEl = document.getElementById("descricao-" + imdbId);
-        const generoEl = document.getElementById("genero-" + imdbId);
-        const notaEl = document.getElementById("nota-" + imdbId);
-
-        if (box.classList.contains("visible")) {
-            // Esconder
-            box.classList.remove("visible");
-            botao.innerHTML = '<i class="fa-solid fa-circle-info"></i> Mostrar detalhes';
-            return;
-        }
-
-        // Se já carregou antes, só mostrar
-        if (descEl.innerText && descEl.innerText !== "Carregando...") {
-            box.classList.add("visible");
-            botao.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Ocultar detalhes';
-            return;
-        }
-
-        // Carregar dados do backend
-        descEl.innerText = "Carregando...";
-        generoEl.innerText = "Carregando...";
-        notaEl.innerText = "⭐ ...";
-
-        fetch("/detalhes/" + imdbId)
-        .then(r => r.json())
-        .then(filme => {
-            descEl.innerText = filme.descricao || "Descrição não encontrada.";
-
-            generoEl.innerText = filme.genero || "Desconhecido";
-            generoEl.style.display = "block";
-
-            notaEl.innerText = "⭐ " + (filme.nota || "N/A");
-            notaEl.style.display = "block";
-
-            box.classList.add("visible");
-            botao.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Ocultar detalhes';
-        })
-        .catch(() => {
-            descEl.innerText = "Erro ao carregar detalhes.";
-        });
-    }
-    function salvarFilme(botao) {
-      botao.classList.add("salvo");
-      botao.innerHTML = '<i class="fa-solid fa-check"></i> Salvo';
-      botao.disabled = true;
-    }
-
-    async function favoritarFilme(botao) {
-  const card = botao.closest(".card");
-  const imdbId = card.querySelector(".btn-favoritar").dataset.id;
-  const titulo = card.querySelector(".btn-favoritar").dataset.titulo;
-  const imagem = card.querySelector(".btn-favoritar").dataset.imagem;
-  const genero = card.querySelector(".btn-favoritar").dataset.genero;
-
-  try {
-    const resposta = await fetch("/favoritar", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: `imdbId=${encodeURIComponent(imdbId)}&titulo=${encodeURIComponent(titulo)}&imagem=${encodeURIComponent(imagem)}&genero=${encodeURIComponent(genero)}`
-    });
-
-    const resultado = await resposta.text();
-
-    if (resultado === "ADICIONADO") {
-      botao.classList.add("favoritado");
-      botao.innerHTML = '<i class="fa-solid fa-heart-circle-check"></i> Favoritado';
-    } else if (resultado === "REMOVIDO") {
-      botao.classList.remove("favoritado");
-      botao.innerHTML = '<i class="fa-solid fa-heart"></i> Favoritar';
-    } else if (resultado.startsWith("ERRO")) {
-      alert("Você precisa estar logado para favoritar filmes.");
-    }
-  } catch (e) {
-    console.error("Erro ao favoritar:", e);
-    alert("Ocorreu um erro ao tentar favoritar o filme.");
-  }
-}
-</script>
+<script src="/js/filmes.js"></script>
 </body>
 </html>

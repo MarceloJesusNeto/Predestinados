@@ -93,4 +93,24 @@ public class FavoritoController {
 
         return "curtidos";
     }
+
+    @GetMapping("/favoritos/ids")
+    @ResponseBody
+    public List<String> listarIdsFavoritos(HttpServletRequest request) {
+        String usuarioIdStr = cookieService.getCookie(request, "usuarioId");
+        if (usuarioIdStr == null) {
+            return List.of(); // usuário não logado
+        }
+
+        Long usuarioId = Long.parseLong(usuarioIdStr);
+        Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
+        if (usuario == null) {
+            return List.of();
+        }
+
+        return favoritoRepository.findByUsuario(usuario)
+                .stream()
+                .map(FilmeFavorito::getImdbId)
+                .toList();
+    }
 }

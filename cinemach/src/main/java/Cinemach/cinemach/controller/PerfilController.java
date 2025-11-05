@@ -1,8 +1,10 @@
 package Cinemach.cinemach.controller;
 
 import Cinemach.cinemach.model.FilmeSalvo;
+import Cinemach.cinemach.model.FotoPerfil;
 import Cinemach.cinemach.model.Usuario;
 import Cinemach.cinemach.repository.FilmeSalvoRepository;
+import Cinemach.cinemach.repository.FotoPerfilRepository;
 import Cinemach.cinemach.repository.UsuarioRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -28,32 +31,43 @@ public class PerfilController {
     @Autowired
     private FilmeSalvoRepository filmeSalvoRepository;
 
+    @Autowired
+    private FotoPerfilRepository fotoPerfilRepository;
+
     @PostMapping("/salvarFilme")
     @ResponseBody
-    public String salvarFilme(@RequestParam String imdbId,
-                              @RequestParam String titulo,
-                              @RequestParam String imagem,
-                              @RequestParam String genero,
-                              HttpSession session) {
+    public String salvarFilme(
+            @RequestParam String imdbId,
+            @RequestParam(required = false) String titulo,
+            @RequestParam(required = false) String imagem,
+            @RequestParam(required = false) String genero,
+            HttpSession session) {
+
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
-
         if (usuario == null) {
-            return "ERRO_LOGIN";
+            return "NAO_LOGADO";
         }
 
-        long total = filmeSalvoRepository.countByUsuario(usuario);
-        if (total >= 10) {
-            return "LIMITE";
-        }
+        // Garantir que os campos não fiquem nulos
+        if (titulo == null || titulo.isBlank()) titulo = "Título não disponível";
+        if (imagem == null || imagem.isBlank()) imagem = "/img/placeholder.jpg";
+        if (genero == null || genero.isBlank()) genero = "Desconhecido";
 
-        var existente = filmeSalvoRepository.findByUsuarioAndImdbId(usuario, imdbId);
+        Optional<FilmeSalvo> existente = filmeSalvoRepository.findByUsuarioAndImdbId(usuario, imdbId);
         if (existente.isPresent()) {
             filmeSalvoRepository.delete(existente.get());
             return "REMOVIDO";
         }
 
-        FilmeSalvo filme = new FilmeSalvo(imdbId, titulo, imagem, genero, usuario);
+        FilmeSalvo filme = new FilmeSalvo();
+        filme.setImdbId(imdbId);
+        filme.setTitulo(titulo);
+        filme.setImagem(imagem);
+        filme.setGenero(genero);
+        filme.setUsuario(usuario);
+
         filmeSalvoRepository.save(filme);
+
         return "ADICIONADO";
     }
 
@@ -134,4 +148,49 @@ public class PerfilController {
         return "Perfil atualizado com sucesso!";
     }
 
+    @GetMapping("/salvos/ids")
+    @ResponseBody
+    public List<String> listarIdsSalvos(HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
+        if (usuario == null) {
+            return List.of(); // usuário não logado
+        }
+
+        return filmeSalvoRepository.findByUsuario(usuario)
+                .stream()
+                .map(f -> f.getImdbId())
+                .toList();
+    }
+
+    @GetMapping("/fotos")
+    @ResponseBody
+    public List<FotoPerfil> listarFotos() {
+        return fotoPerfilRepository.findAll();
+    }
+
+    @PostMapping("/atualizarFoto")
+    @ResponseBody
+    public String atualizarFoto(@RequestParam("idFoto") Long idFoto, HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
+
+        if (usuario == null) {
+            return "ERRO_SESSAO";
+        }
+
+        FotoPerfil foto = fotoPerfilRepository.findById(idFoto).orElse(null);
+        if (foto == null) {
+            return "ERRO_FOTO";
+        }
+
+        usuario.setFotoPerfil(foto);
+        usuarioRepository.save(usuario);
+
+        // 🔧 Recarrega o usuário completo do banco (garante que nada fica nulo)
+        Usuario usuarioAtualizado = usuarioRepository.findById(usuario.getId()).orElse(usuario);
+
+        // Atualiza a sessão com o objeto sincronizado
+        session.setAttribute("usuarioLogado", usuarioAtualizado);
+
+        return "OK";
+    }
 }

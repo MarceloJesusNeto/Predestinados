@@ -1,65 +1,118 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CineMatch - Login</title>
-  <link rel="stylesheet" th:href="@{/css/login.css}">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-  <script src="https://kit.fontawesome.com/a2b5e9f5b2.js" crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch - Login</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a2b5e9f5b2.js" crossorigin="anonymous"></script>
 </head>
+<style>
+    .logo-link {
+      position: absolute;
+      top: 20px;
+      left: 30px;
+      z-index: 10;
+    }
+
+    .logo-btn {
+      width: 150px; /* tamanho da logo */
+      height: auto;
+      cursor: pointer;
+      background: none;
+      border: none;
+      box-shadow: none;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    /* Efeito suave quando o mouse passa por cima */
+    .logo-btn:hover {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+    /* ===== LOGO DO CINEMATCH ===== */
+    .logo-link {
+      position: absolute;
+      top: 20px;
+      left: 30px;
+      z-index: 10;
+    }
+
+    .logo-btn {
+      width: 80px;
+      height: auto;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      transition: transform 0.4s ease, filter 0.4s ease;
+    }
+
+    /* Efeito de hover com brilho e leve aumento */
+    .logo-btn:hover {
+      transform: scale(1.08);
+      filter: drop-shadow(0 0 10px #ff4df5) brightness(1.3);
+    }
+
+
+</style>
 <body>
 
-  <div style="background:url('https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;" class="left-side">
+<a href="/" class="logo-link">
+    <img src="img/icons8-seta-esquerda-64.png" alt="CineMatch" class="logo-btn">
+</a>
+
+<div style="background:url('https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;" class="left-side">
     <div class="overlay"></div>
     <div class="left-content">
-      <h1 class="logo">CineMatch</h1>
-      <p class="subtitle">Descubra filmes e pessoas com gostos parecidos</p>
+        <h1 class="logo">CineMatch</h1>
+        <p class="subtitle">Descubra filmes e pessoas com gostos parecidos</p>
     </div>
-  </div>
+</div>
 
-  <div class="right-side">
+<div class="right-side">
     <div class="login-box">
-      <h2>Entrar</h2>
+        <h2>Entrar</h2>
 
 
         <form action="/login" method="post" autocomplete="on">
 
-        <div class="input-group">
+            <div class="input-group">
 
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Digite seu e-mail"
-            required
-            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-          >
-        </div>
+                <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Digite seu e-mail"
+                        required
+                        pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                >
+            </div>
 
-        <div class="input-group">
-          
-          <input
-            type="password"
-            id="senha"
-            name="senha"
-            placeholder="Digite sua senha"
-            required
-            minlength="6"
-          >
-        </div>
+            <div class="input-group">
 
-        <button type="submit">Entrar</button>
+                <input
+                        type="password"
+                        id="senha"
+                        name="senha"
+                        placeholder="Digite sua senha"
+                        required
+                        minlength="6"
+                >
+            </div>
 
-          <p th:if="${erro}" style="color: red; margin-top: 10px;" th:text="${erro}"></p>
-      </form>
+            <button type="submit">Entrar</button>
 
-      <p class="signup-text">
-        Não tem conta ainda?
-        <a href="/registrar">Criar conta</a>
-      </p>
+            <p th:if="${erro}" style="color: red; margin-top: 10px;" th:text="${erro}"></p>
+        </form>
+
+        <p class="signup-text">
+            Não tem conta ainda?
+            <a href="/registrar">Criar conta</a>
+        </p>
     </div>
-  </div>
+</div>
 
 </body>
 </html>

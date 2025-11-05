@@ -34,5 +34,25 @@ public class FilmeSalvo {
     public String getGenero() { return genero; }
     public Usuario getUsuario() { return usuario; }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setImdbId(String imdbId) {
+        this.imdbId = imdbId;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
+    }
+
+    public void setGenero(String genero) {
+        this.genero = genero;
+    }
+
     public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 }

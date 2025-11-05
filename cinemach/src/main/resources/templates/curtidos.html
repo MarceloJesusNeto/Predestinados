@@ -18,6 +18,7 @@
   font-weight: <weight>;
   font-style: normal;
         margin-top:8%;
+        margin-bottom: 100px;
         }
 
         section h2{
@@ -175,6 +176,38 @@
         </div>
     </div>
 </section>
+
+
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-col">
+            <img th:src="@{/img/cinematchlogo1-removebg-preview.png}" alt="Cinemach" class="footer-logo">
+            <p>Soluções de recomendação e descoberta de filmes personalizadas.</p>
+        </div>
+
+        <div class="footer-col">
+            <h4>Links Rápidos</h4>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/registrar">Pesquisar</a></li>
+                <li><a href="/registrar">Chat</a></li>
+                <li><a href="/registrar">Favoritos</a></li>
+                <li><a href="/registrar">Perfil</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4>Contato</h4>
+            <p><i class="fa-solid fa-location-dot"></i> Rua Exemplo, 123 - São Paulo, SP</p>
+            <p><i class="fa-solid fa-phone"></i> (11) 1234-5678</p>
+            <p><i class="fa-solid fa-envelope"></i> contato@cinematch.com.br</p>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>© 2025 Cinematch. Todos os direitos reservados.</p>
+    </div>
+</footer>
 
 <script>
     async function desfavoritarFilme(botao) {

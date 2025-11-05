@@ -15,10 +15,14 @@ public class Usuario {
     @Column(unique = true)
     private String email;
 
+    @ManyToOne
+    @JoinColumn(name = "foto_perfil_id")
+    private FotoPerfil fotoPerfil;
+
     private String senha;
 
     @Column(length = 255)
-    private String generos; // ← novo campo
+    private String generos;
 
     public Long getId() {
         return id;
@@ -28,9 +32,7 @@ public class Usuario {
         this.id = id;
     }
 
-    public void setSenha(String senha) {
-        this.senha = new BCryptPasswordEncoder().encode(senha);
-    }
+    public void setSenha(String senha) { this.senha = senha;}
 
     public String getSenha() {
         return senha;
@@ -58,5 +60,13 @@ public class Usuario {
 
     public void setGeneros(String generos) {
         this.generos = generos;
+    }
+
+    public FotoPerfil getFotoPerfil() {
+        return fotoPerfil;
+    }
+
+    public void setFotoPerfil(FotoPerfil fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
     }
 }
