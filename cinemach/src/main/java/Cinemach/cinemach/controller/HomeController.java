@@ -112,16 +112,6 @@ public class HomeController {
         return "pesquisa";
     }
 
-
-    @GetMapping("/chat")
-    public String chat(HttpSession session, Model model) {
-        if (session.getAttribute("usuarioLogado") == null) {
-            model.addAttribute("erro", "Você precisa estar logado para acessar o chat.");
-            return "login";
-        }
-        return "chat";
-    }
-
     @GetMapping("/detalhes/{imdbId}")
     @ResponseBody
     public Filme getDetalhes(@PathVariable String imdbId) {

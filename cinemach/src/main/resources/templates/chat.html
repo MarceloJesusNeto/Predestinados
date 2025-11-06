@@ -1,69 +1,292 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CineMatch - Chat</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta charset="utf-8" />
+    <title>CineMatch - Chat</title>
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/home.css">
     <link rel="shortcut icon" href="/img/cinematchlogo1-removebg-preview (1).png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+
+
+    <style>
+        main {
+          font-family: "Nunito", sans-serif;
+          font-optical-sizing: auto;
+          font-style: normal;
+        }
+
+        /* --- Layout principal --- */
+        .chat-layout {
+  display: grid;
+  grid-template-columns: 1fr 350px; /* área central + lateral direita */
+  gap: 20px;
+  padding: 20px;
+  color: white;
+  margin-top: 130px; /* <---- Aumente esta margem */
+  position: relative;
+  z-index: 1;
+}
+
+        /* --- Área do chat (esquerda) --- */
+        .chat-area {
+          background-color: #111;
+          border-radius: 12px;
+          padding: 15px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          height: 75vh;
+        }
+
+        .messages {
+          overflow-y: auto;
+          flex-grow: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          padding: 10px;
+        }
+
+        /* Scroll customizado (chat e sugestões) */
+        .messages::-webkit-scrollbar,
+        .suggestions::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        .messages::-webkit-scrollbar-thumb,
+        .suggestions::-webkit-scrollbar-thumb {
+          background-color: #e60073;
+          border-radius: 10px;
+        }
+
+        .messages::-webkit-scrollbar-track,
+        .suggestions::-webkit-scrollbar-track {
+          background: #2c2c2c;
+        }
+
+        .msg {
+          max-width: 70%;
+          padding: 8px 14px;
+          border-radius: 12px;
+          font-size: 14px;
+          word-wrap: break-word;
+        }
+
+        .msg.left {
+          align-self: flex-start;
+          background-color: #2c2c2c;
+        }
+
+        .msg.right {
+          align-self: flex-end;
+          background-color: #e60073;
+          color: white;
+        }
+
+        .chat-input {
+          display: flex;
+          gap: 10px;
+          margin-top: 10px;
+        }
+
+        .chat-input input {
+          flex: 1;
+          padding: 10px;
+          border-radius: 8px;
+          border: none;
+          background-color: #2c2c2c;
+          color: white;
+        }
+
+        .chat-input button {
+          background-color: #e60073;
+          border: none;
+          border-radius: 8px;
+          color: white;
+          padding: 10px 16px;
+          cursor: pointer;
+          transition: 0.3s;
+        }
+
+        .chat-input button:hover {
+          background-color: #ff007f;
+        }
+
+        /* --- Sugestões (direita) --- */
+        .suggestions {
+          background-color: #0b0014;
+          border-radius: 12px;
+          padding: 15px;
+          overflow-y: auto;
+          height: 75vh;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .suggestions h3 {
+          text-align: center;
+          margin-bottom: 15px;
+          color: #ff007f;
+        }
+
+        /* GRID de 2 colunas */
+        .suggestions-list {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
+        }
+
+        /* Card individual */
+        .suggestion {
+          background-color: #2c0036;
+          border-radius: 10px;
+          padding: 10px;
+          text-align: center;
+          transition: 0.3s;
+        }
+
+        .suggestion:hover {
+          transform: translateY(-3px);
+          background-color: #350047;
+        }
+
+        .suggestion img {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          margin-bottom: 10px;
+          object-fit: cover;
+        }
+
+        .suggestion .info .baixa {
+          color: red;
+        }
+        .suggestion .info .media {
+          color: orange;
+        }
+        .suggestion .info .alta {
+          color: limegreen;
+        }
+
+        .enviar,
+        .excluir {
+          margin-top: 5px;
+          padding: 5px 10px;
+          border-radius: 6px;
+          cursor: pointer;
+          border: none;
+          width: 100%;
+        }
+
+        .enviar {
+          background-color: green;
+          color: white;
+        }
+        .excluir {
+          background-color: red;
+          color: white;
+        }
+    </style>
 </head>
 <body>
+
+
 <header th:if="${session.usuarioLogado != null}">
     <div class="logo-header">
         <img src="/img/cinematchlogo1-removebg-preview.png" alt="CineMatch Logo">
         <h1>CineMatch</h1>
     </div>
     <nav class="nav-links">
-        <a href="/">
-            <i class="fa-solid fa-house"></i>
-            <span>Home</span>
-        </a>
-        <a href="/pesquisa">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <span>Pesquisar</span>
-        </a>
-        <a href="/chat">
-            <i class="fa-solid fa-comment"></i>
-            <span>Chat</span>
-        </a>
-        <a href="/curtidos">
-            <i class="fa-solid fa-heart"></i>
-            <span>Favoritos</span>
-        </a>
-        <a href="/perfil">
-            <i class="fa-solid fa-user"></i>
-            <span>Perfil</span>
-        </a>
+        <a href="/"><i class="fa-solid fa-house"></i><span>Home</span></a>
+        <a href="/pesquisa"><i class="fa-solid fa-magnifying-glass"></i><span>Pesquisar</span></a>
+        <a href="/chat" class="active"><i class="fa-solid fa-comment"></i><span>Chat</span></a>
+        <a href="/curtidos"><i class="fa-solid fa-heart"></i><span>Favoritos</span></a>
+        <a href="/perfil"><i class="fa-solid fa-user"></i><span>Perfil</span></a>
     </nav>
 </header>
 
-<header th:if="${session.usuarioLogado == null}">
-    <h1>CineMatch</h1>
-    <nav>
-        <a href="/login" class="btn-login">Entrar</a>
-        <a href="/registrar" class="btn-cadastrar">Cadastrar</a>
-    </nav>
-</header>
+<main class="chat-page">
+    <div class="tabs">
+        <button id="chats-tab" class="tab active">CHATS</button>
+        <button id="solicitacoes-tab" class="tab">SOLICITAÇÕES</button>
+    </div>
 
-  <main class="container">
-    <section class="chat-section">
-      <h2>Chat 💬</h2>
+    <div id="solicitacoes" class="solicitacoes" style="display:none;">
+        <div th:each="sol : ${solicitacoes}" class="sol-card">
+            <p><strong th:text="${sol.remetente.nome}"></strong> quer conversar com você.</p>
+            <form th:action="@{/responderSolicitacao}" method="post">
+                <input type="hidden" name="id" th:value="${sol.id}">
+                <button name="acao" value="aceitar" class="aceitar">Aceitar</button>
+                <button name="acao" value="negar" class="negar">Negar</button>
+            </form>
+        </div>
+    </div>
+    <div class="chat-layout">
+        <!-- Coluna do chat central -->
+        <section class="chat-area">
+            <div class="messages" id="messages">
+                <div th:each="mensagem : ${mensagens}">
+                    <div th:classappend="${mensagem.remetente.id == session.usuarioLogado.id} ? 'msg right' : 'msg left'"
+                         th:text="${mensagem.conteudo}"></div>
+                </div>
+            </div>
 
-      <div class="chat-container">
-        <div id="chat-messages" class="chat-messages"></div>
+            <form class="chat-input" th:action="@{/enviarMensagem}" method="post">
+                <input type="hidden" name="destinatarioId" th:value="${destinatarioId}" />
+                <input type="text" name="conteudo" placeholder="Digite..." required />
+                <button type="submit">Enviar</button>
+            </form>
+        </section>
 
-        <form id="chat-form" class="chat-form">
-          <input id="chat-input" type="text" placeholder="Escreva uma mensagem..." autocomplete="off" />
-          <button type="submit" class="btn-enviar">Enviar</button>
-          <button type="button" id="chat-clear" class="btn-nao">Limpar</button>
-        </form>
-      </div>
-    </section>
-  </main>
+        <!-- Coluna direita - sugestões -->
+        <aside class="suggestions">
+            <h3>Sugestões de pessoas pra conhecer</h3>
+            <div class="suggestions-list">
+                <div class="suggestion" th:each="s : ${sugeridos}">
+                    <img th:src="${s.fotoPerfil != null ? s.fotoPerfil.url : '/img/user-default.png'}"
+                         alt="foto de perfil">
+                    <div class="info">
+                        <p><strong th:text="${s.nome}"></strong></p>
+                        <p>Compatibilidade:
+                            <span th:text="${compatibilidades[s.id]}"
+                                  th:classappend="${compatibilidades[s.id] == 'Alta'} ? ' alta' :
+      (${compatibilidades[s.id] == 'Média'} ? ' media' : ' baixa')">
+</span>
+                        </p>
+                        <form th:action="@{/enviarSolicitacao}" method="post">
+                            <input type="hidden" name="id" th:value="${s.id}">
+                            <button type="submit" class="enviar">Enviar</button>
+                        </form>
+                        <form th:action="@{/excluirSugestao}" method="post">
+                            <input type="hidden" name="id" th:value="${s.id}">
+                            <button type="submit" class="excluir">Excluir</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</main>
+<script>
 
-<script th:src="@{/app.js}"></script>
+const chatsTab = document.getElementById("chats-tab");
+const solicitacoesTab = document.getElementById("solicitacoes-tab");
+const solicitacoesDiv = document.getElementById("solicitacoes");
+
+chatsTab.onclick = () => {
+  chatsTab.classList.add("active");
+  solicitacoesTab.classList.remove("active");
+  solicitacoesDiv.style.display = "none";
+};
+
+solicitacoesTab.onclick = () => {
+  solicitacoesTab.classList.add("active");
+  chatsTab.classList.remove("active");
+  solicitacoesDiv.style.display = "block";
+};
+
+</script>
 </body>
 </html>

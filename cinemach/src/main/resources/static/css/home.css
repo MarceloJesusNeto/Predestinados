@@ -91,7 +91,13 @@
 
          }
 
-        main { margin:20px 0px 0px 0px; }
+        main {
+        margin:20px 0px 0px 0px;
+        font-family: "Nunito", sans-serif;
+          font-optical-sizing: auto;
+          font-weight: <weight>;
+          font-style: normal;
+        }
 
         /* === HERO === */
         .hero {
@@ -812,3 +818,115 @@ button,
       pointer-events: none;
       user-select: none;
     }
+
+/* ==== chat ==== */
+
+.chat-layout {
+    display: grid;
+    grid-template-columns: 1fr 350px; /* centro + direita */
+    gap: 20px;
+    padding: 20px;
+    color: white;
+    margin-top:100px
+
+}
+
+.chat-area {
+    background-color: #111;
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 75vh;
+}
+
+.messages {
+    overflow-y: auto;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+}
+
+.msg {
+    max-width: 70%;
+    padding: 8px 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    word-wrap: break-word;
+}
+
+.msg.left {
+    align-self: flex-start;
+    background-color: #2c2c2c;
+}
+
+.msg.right {
+    align-self: flex-end;
+    background-color: #e60073;
+    color: white;
+}
+
+.chat-input {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background-color: #2c2c2c;
+    color: white;
+}
+
+.chat-input button {
+    background-color: #e60073;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    padding: 10px 16px;
+    cursor: pointer;
+}
+
+.suggestions {
+    background-color: #1b0022;
+    border-radius: 12px;
+    padding: 15px;
+    overflow-y: auto;
+    height: 75vh;
+}
+
+.suggestion {
+    background-color: #2c0036;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.suggestion img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.suggestion .info .baixa { color: red; }
+.suggestion .info .media { color: orange; }
+.suggestion .info .alta { color: limegreen; }
+
+.enviar, .excluir {
+    margin-top: 5px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+}
+
+.enviar { background-color: green; color: white; }
+.excluir { background-color: red; color: white; }
