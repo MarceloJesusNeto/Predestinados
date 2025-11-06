@@ -10,6 +10,39 @@
           -moz-osx-font-smoothing: grayscale;
         }
 
+.aviso-limite {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ff4444;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* Quando a classe 'mostrar' é adicionada */
+.aviso-limite.mostrar {
+  opacity: 1;
+}
+
+/* Tipos opcionais (cores diferentes para sucesso/erro/info) */
+.aviso-limite.sucesso {
+  background-color: #4CAF50;
+}
+.aviso-limite.info {
+  background-color: #2196F3;
+}
+.aviso-limite.erro {
+  background-color: #ff4444;
+}
+
         /* HEADER */
         header {
             font-family: "Nunito", sans-serif;

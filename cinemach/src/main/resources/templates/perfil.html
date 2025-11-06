@@ -400,7 +400,7 @@ button,
         <div class="modal-content-foto">
             <h2>Escolha sua foto de perfil:</h2>
             <div class="grade-fotos"></div>
-            <button id="salvarFoto" class="btn-salvar">Salvar</button>
+            <button id="salvarFoto" class="btn-salvar-foto">Salvar</button>
             <button id="cancelarFoto" class="btn-cancelar">Cancelar</button>
         </div>
     </div>
@@ -524,8 +524,11 @@ async function removerFilme(botao) {
        * ============================
        */
       document.querySelectorAll(".btn-salvar").forEach(botao => {
+    // impede que o botão de salvar foto dispare o mesmo evento
+    if (!botao.classList.contains("btn-salvar-foto")) {
         botao.addEventListener("click", () => salvarFilme(botao));
-      });
+    }
+});
 
       document.querySelectorAll(".btn-remover").forEach(botao => {
         botao.addEventListener("click", () => removerFilme(botao));
@@ -609,7 +612,7 @@ async function abrirModalFoto() {
   });
 }
 
-document.getElementById("salvarFoto").onclick = async () => {
+document.querySelector(".btn-salvar-foto").onclick = async () => {
   if (!idFotoSelecionada) return alert("Selecione uma foto");
 
   const resp = await fetch("/perfil/atualizarFoto", {

@@ -1,5 +1,3 @@
-
-
 package Cinemach.cinemach.service;
 
 import Cinemach.cinemach.model.Filme;
@@ -9,14 +7,17 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 
 import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ImdbService {
-    private static final String API_KEY = "bbb4983";
+    private static final String API_KEY = "4bd65d1e";
     private static final String SEARCH_URL = "https://www.omdbapi.com/?apikey=" + API_KEY + "&s=";
     private static final String DETAIL_URL = "https://www.omdbapi.com/?apikey=" + API_KEY + "&i=";
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private static final ExecutorService executor = Executors.newFixedThreadPool(12); // 🔥 paralelismo
 
     private static final List<String> KEYWORDS = Arrays.asList(
             "love","life","death","dream","power","world","future","legend",
@@ -24,61 +25,75 @@ public class ImdbService {
             "ghost","soul","magic","space","vampire","zombie","romance"
     );
 
-
     private List<Filme> cacheFilmesAleatorios = new ArrayList<>();
     private long cacheTimestamp = 0;
-    private static final long CACHE_TTL = 1000L * 60 * 60; // 1h
+    private static final long CACHE_TTL = 1000L * 60 * 60; // 1 hora
 
     private String reduzirPoster(String posterUrl) {
         if (posterUrl == null || posterUrl.equals("N/A")) return "/img/placeholder.jpg";
-        return posterUrl.replaceAll("\\._V1.*\\.jpg", "._V1_SX300.jpg");
+        return posterUrl.replaceAll("\\._V1.*\\.jpg", "._V1_SX150.jpg");
     }
 
+    // ==============================================
+    // 🚀 Busca otimizada com paralelismo + cache
+    // ==============================================
     public List<Filme> buscarFilmesAleatorios() {
-        List<Filme> filmes = new ArrayList<>();
-        Set<String> titulosUsados = new HashSet<>();
+        long agora = System.currentTimeMillis();
+        if (!cacheFilmesAleatorios.isEmpty() && (agora - cacheTimestamp < CACHE_TTL)) {
+            return cacheFilmesAleatorios;
+        }
 
-        try {
-            List<String> palavrasMisturadas = new ArrayList<>(KEYWORDS);
-            Collections.shuffle(palavrasMisturadas);
+        List<Filme> filmes = Collections.synchronizedList(new ArrayList<>());
+        Set<String> titulosUsados = ConcurrentHashMap.newKeySet();
 
-            for (String palavra : palavrasMisturadas) {
-                String resposta = restTemplate.getForObject(SEARCH_URL + palavra, String.class);
-                JSONObject json = new JSONObject(resposta);
+        List<String> palavrasMisturadas = new ArrayList<>(KEYWORDS);
+        Collections.shuffle(palavrasMisturadas);
 
-                if (json.has("Search")) {
-                    JSONArray results = json.getJSONArray("Search");
+        // 🔥 Pega só 10 palavras (já suficiente pra 80 filmes)
+        List<String> palavrasSelecionadas = palavrasMisturadas.subList(0, Math.min(10, palavrasMisturadas.size()));
 
-                    // agora pega até 5 filmes por palavra-chave
-                    for (int i = 0; i < Math.min(results.length(), 5); i++) {
-                        JSONObject f = results.getJSONObject(i);
-                        String imdbId = f.optString("imdbID", "");
+        List<CompletableFuture<Void>> futures = palavrasSelecionadas.stream()
+                .map(palavra -> CompletableFuture.runAsync(() -> {
+                    try {
+                        String resposta = restTemplate.getForObject(SEARCH_URL + palavra, String.class);
+                        JSONObject json = new JSONObject(resposta);
 
-                        Filme detalhes = buscarDetalhes(imdbId);
-                        if (detalhes != null) {
-                            String tituloLower = detalhes.getTitulo().toLowerCase();
+                        if (json.has("Search")) {
+                            JSONArray results = json.getJSONArray("Search");
 
-                            if (!titulosUsados.contains(tituloLower)) {
-                                filmes.add(detalhes);
-                                titulosUsados.add(tituloLower);
+                            // Pega até 10 filmes por palavra
+                            for (int i = 0; i < Math.min(results.length(), 10); i++) {
+                                JSONObject f = results.getJSONObject(i);
+                                String imdbId = f.optString("imdbID", "");
+
+                                // Cria subtarefa para buscar detalhes
+                                CompletableFuture.runAsync(() -> {
+                                    Filme detalhes = buscarDetalhes(imdbId);
+                                    if (detalhes != null) {
+                                        String tituloLower = detalhes.getTitulo().toLowerCase();
+                                        if (titulosUsados.add(tituloLower)) {
+                                            filmes.add(detalhes);
+                                        }
+                                    }
+                                }, executor);
                             }
                         }
+                    } catch (Exception ignored) {}
+                }, executor))
+                .collect(Collectors.toList());
 
-                        // agora gera até 81 filmes no cache
-                        if (filmes.size() >= 81) break;
-                    }
-                }
+        // Espera todas as buscas terminarem (máx. 20s)
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).orTimeout(20, TimeUnit.SECONDS).join();
 
-                if (filmes.size() >= 81) break;
-            }
-
-            Collections.shuffle(filmes);
-        } catch (Exception e) {
-            System.err.println("Erro buscarFilmesAleatorios: " + e.getMessage());
-        }
-        return filmes;
+        Collections.shuffle(filmes);
+        cacheFilmesAleatorios = filmes.stream().limit(81).collect(Collectors.toList());
+        cacheTimestamp = agora;
+        return cacheFilmesAleatorios;
     }
 
+    // ==============================================
+    // ⚡ Busca detalhe individual (rápido e otimizado)
+    // ==============================================
     public Filme buscarDetalhes(String imdbId) {
         try {
             String detalheStr = restTemplate.getForObject(DETAIL_URL + imdbId, String.class);
@@ -93,11 +108,13 @@ public class ImdbService {
                     imdbId
             );
         } catch (Exception e) {
-            System.err.println("Erro buscarDetalhes: " + e.getMessage());
             return null;
         }
     }
 
+    // ==============================================
+    // 🔍 Busca por título (mantida igual)
+    // ==============================================
     public List<Filme> buscarPorTitulo(String titulo) {
         try {
             String resposta = restTemplate.getForObject(SEARCH_URL + titulo, String.class);
@@ -106,16 +123,23 @@ public class ImdbService {
             List<Filme> filmes = new ArrayList<>();
             if (json.has("Search")) {
                 JSONArray results = json.getJSONArray("Search");
+
+                // Executa detalhes em paralelo
+                List<CompletableFuture<Void>> futures = new ArrayList<>();
+
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject f = results.getJSONObject(i);
                     String imdbId = f.optString("imdbID", "");
-                    Filme detalhes = buscarDetalhes(imdbId);
-                    if (detalhes != null) filmes.add(detalhes);
+                    futures.add(CompletableFuture.runAsync(() -> {
+                        Filme detalhes = buscarDetalhes(imdbId);
+                        if (detalhes != null) filmes.add(detalhes);
+                    }, executor));
                 }
+
+                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
             }
             return filmes;
         } catch (Exception e) {
-            System.err.println("Erro buscarPorTitulo: " + e.getMessage());
             return Collections.emptyList();
         }
     }

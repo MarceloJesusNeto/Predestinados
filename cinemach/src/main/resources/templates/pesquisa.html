@@ -410,5 +410,38 @@
 <script src="https://kit.fontawesome.com/a2e0e6c6c1.js" crossorigin="anonymous"></script>
 
 <script src="/js/filmes.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Reaproveita o mesmo sistema da home
+      inicializarSistemaFilmes(); // <- Função central do /js/filmes.js
+
+      // Pesquisa dinâmica (opcional)
+      const formPesquisa = document.querySelector(".barra-pesquisa");
+      const inputPesquisa = formPesquisa.querySelector("input");
+      const catalogo = document.getElementById("catalogo");
+
+      formPesquisa.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const query = inputPesquisa.value.trim();
+        if (!query) return;
+
+        try {
+          const resposta = await fetch(`/pesquisa?q=${encodeURIComponent(query)}`);
+          const html = await resposta.text();
+          const temp = document.createElement("div");
+          temp.innerHTML = html;
+
+          const novosCards = temp.querySelectorAll(".card");
+          catalogo.innerHTML = "";
+          novosCards.forEach(card => catalogo.appendChild(card));
+
+          inicializarSistemaFilmes(); // <- Reaplica eventos
+        } catch (erro) {
+          console.error("Erro na pesquisa:", erro);
+        }
+      });
+    });
+</script>
 </body>
 </html>

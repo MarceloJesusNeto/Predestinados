@@ -10,4 +10,6 @@ public interface FilmeSalvoRepository extends JpaRepository<FilmeSalvo, Long> {
     List<FilmeSalvo> findByUsuario(Usuario usuario);
     Optional<FilmeSalvo> findByUsuarioAndImdbId(Usuario usuario, String imdbId);
     long countByUsuario(Usuario usuario);
+
+
 }
