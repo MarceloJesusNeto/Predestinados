@@ -76,7 +76,7 @@ public class HomeController {
             session.setAttribute("filmesCache", filmesCache);
         }
 
-        // 27 filmes
+
         int fim = Math.min(27, filmesCache.size());
         List<Filme> filmesPagina = filmesCache.subList(0, fim);
 
@@ -121,18 +121,18 @@ public class HomeController {
     @GetMapping("/filmes/mais")
     @ResponseBody
     public List<Filme> carregarMaisFilmes(HttpSession session) {
-        // Busca o cache atual, se houver
+
         List<Filme> filmesCache = (List<Filme>) session.getAttribute("filmesCache");
 
-        // Se não existir, cria um novo cache
+
         if (filmesCache == null) {
             filmesCache = new ArrayList<>();
         }
 
-        // Busca novos filmes do serviço
+
         List<Filme> novos = imdbService.buscarFilmesAleatorios();
 
-        // Garante que não haja duplicados
+
         Set<String> idsExistentes = filmesCache.stream()
                 .map(Filme::getImdbId)
                 .collect(Collectors.toSet());
@@ -141,7 +141,7 @@ public class HomeController {
                 .filter(f -> !idsExistentes.contains(f.getImdbId()))
                 .collect(Collectors.toList());
 
-        // Adiciona ao cache e retorna apenas 27
+
         filmesCache.addAll(novosUnicos);
         session.setAttribute("filmesCache", filmesCache);
 

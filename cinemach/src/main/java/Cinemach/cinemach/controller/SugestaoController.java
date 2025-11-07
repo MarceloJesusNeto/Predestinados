@@ -38,7 +38,7 @@ public class SugestaoController {
             return "login";
         }
 
-        // remove bloqueios expirados
+
         bloqueadaRepository.findByUsuario(usuarioLogado).forEach(b -> {
             if (b.getExpiracao().isBefore(LocalDateTime.now())) {
                 bloqueadaRepository.delete(b);
@@ -49,7 +49,7 @@ public class SugestaoController {
                 .filter(u -> !u.getId().equals(usuarioLogado.getId()))
                 .collect(Collectors.toList());
 
-        // aplica filtro de bloqueio
+
         List<Long> bloqueados = bloqueadaRepository.findByUsuario(usuarioLogado)
                 .stream().map(b -> b.getBloqueado().getId()).toList();
 
@@ -77,7 +77,7 @@ public class SugestaoController {
             compatibilidades.put(u.getId(), calcularCompatibilidade(usuarioLogado, u));
         }
 
-        // solicitações recebidas pendentes
+
         List<Solicitacao> solicitacoesPendentes =
                 solicitacaoRepository.findByDestinatarioAndStatus(usuarioLogado, "PENDENTE");
 
@@ -127,7 +127,7 @@ public class SugestaoController {
         return "redirect:/chat";
     }
 
-    // =================== LÓGICAS DE COMPATIBILIDADE =================== //
+
 
     private String calcularCompatibilidade(Usuario a, Usuario b) {
         int score = 0;
@@ -135,11 +135,11 @@ public class SugestaoController {
         boolean temFilmesA = temFilmes(a);
         boolean temFilmesB = temFilmes(b);
 
-        // 1️⃣ Gêneros
+
         int generosIguais = calcularPorGeneros(a, b);
         score += generosIguais * 10;
 
-        // 2️⃣ Top 10 (só se ambos tiverem filmes)
+
         if (temFilmesA && temFilmesB) {
             String afinidadeTop10 = calcularPorTop10(a, b);
             switch (afinidadeTop10) {
@@ -149,7 +149,7 @@ public class SugestaoController {
             }
         }
 
-        // 3️⃣ Se nenhum tiver filmes
+
         if (!temFilmesA && !temFilmesB) {
             if (generosIguais == 0) return "Baixa";
             if (generosIguais == 1) return "Baixa";
@@ -157,13 +157,13 @@ public class SugestaoController {
             return "Alta";
         }
 
-        // 4️⃣ Avalia score final
+
         if (score >= 50) return "Alta";
         if (score >= 30) return "Média";
         return "Baixa";
     }
 
-    // =================== FUNÇÕES DE APOIO =================== //
+
 
     private int calcularPorGeneros(Usuario a, Usuario b) {
         if (a.getGeneros() == null || b.getGeneros() == null) return 0;

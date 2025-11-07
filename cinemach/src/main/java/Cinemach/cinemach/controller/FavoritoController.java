@@ -41,27 +41,27 @@ public class FavoritoController {
                             @RequestParam String genero,
                             HttpServletRequest request) {
 
-        // Obtém ID do usuário logado via cookie
+
         String usuarioIdStr = cookieService.getCookie(request, "usuarioId");
         if (usuarioIdStr == null) {
             return "ERRO: Usuário não logado";
         }
 
-        // Busca o usuário no banco
+
         Long usuarioId = Long.parseLong(usuarioIdStr);
         Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
         if (usuario == null) {
             return "ERRO: Usuário não encontrado";
         }
 
-        // Verifica se o filme já está favoritado
+
         FilmeFavorito existente = favoritoRepository.findByUsuarioAndImdbId(usuario, imdbId);
         if (existente != null) {
             favoritoRepository.deleteByUsuarioAndImdbId(usuario, imdbId);
             return "REMOVIDO";
         }
 
-        // Caso contrário, adiciona aos favoritos
+
         FilmeFavorito novo = new FilmeFavorito();
         novo.setUsuario(usuario);
         novo.setImdbId(imdbId);
@@ -99,7 +99,7 @@ public class FavoritoController {
     public List<String> listarIdsFavoritos(HttpServletRequest request) {
         String usuarioIdStr = cookieService.getCookie(request, "usuarioId");
         if (usuarioIdStr == null) {
-            return List.of(); // usuário não logado
+            return List.of();
         }
 
         Long usuarioId = Long.parseLong(usuarioIdStr);

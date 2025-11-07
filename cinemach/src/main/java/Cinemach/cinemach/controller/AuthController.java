@@ -57,7 +57,7 @@ public class AuthController {
     public String logout(HttpSession session, HttpServletResponse response) {
         session.invalidate();
 
-        // limpa cookies
+
         Cookie id = new Cookie("usuarioId", "");
         id.setMaxAge(0);
         id.setPath("/");

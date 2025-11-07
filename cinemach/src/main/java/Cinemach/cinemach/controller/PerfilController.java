@@ -48,25 +48,25 @@ public class PerfilController {
             return "NAO_LOGADO";
         }
 
-        // Valores padrão para evitar nulos
+
         if (titulo == null || titulo.isBlank()) titulo = "Título não disponível";
         if (imagem == null || imagem.isBlank()) imagem = "/img/placeholder.jpg";
         if (genero == null || genero.isBlank()) genero = "Desconhecido";
 
-        // Verifica se o filme já foi salvo → toggle
+
         Optional<FilmeSalvo> existente = filmeSalvoRepository.findByUsuarioAndImdbId(usuario, imdbId);
         if (existente.isPresent()) {
             filmeSalvoRepository.delete(existente.get());
             return "REMOVIDO";
         }
 
-        // 🔒 Verifica se já tem 10 filmes salvos
+
         long total = filmeSalvoRepository.countByUsuario(usuario);
         if (total >= 10) {
             return "LIMITE";
         }
 
-        // Adiciona novo filme
+
         FilmeSalvo filme = new FilmeSalvo();
         filme.setImdbId(imdbId);
         filme.setTitulo(titulo);
@@ -161,7 +161,7 @@ public class PerfilController {
     public List<String> listarIdsSalvos(HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
         if (usuario == null) {
-            return List.of(); // usuário não logado
+            return List.of();
         }
 
         return filmeSalvoRepository.findByUsuario(usuario)
@@ -193,10 +193,10 @@ public class PerfilController {
         usuario.setFotoPerfil(foto);
         usuarioRepository.save(usuario);
 
-        // 🔧 Recarrega o usuário completo do banco (garante que nada fica nulo)
+
         Usuario usuarioAtualizado = usuarioRepository.findById(usuario.getId()).orElse(usuario);
 
-        // Atualiza a sessão com o objeto sincronizado
+
         session.setAttribute("usuarioLogado", usuarioAtualizado);
 
         return "OK";
