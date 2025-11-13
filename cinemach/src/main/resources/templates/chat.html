@@ -3,195 +3,250 @@
 <head>
     <meta charset="utf-8" />
     <title>CineMatch - Chat</title>
+
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/home.css">
     <link rel="shortcut icon" href="/img/cinematchlogo1-removebg-preview (1).png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;400;600;900&display=swap" rel="stylesheet">
 
     <style>
         main {
-          font-family: "Nunito", sans-serif;
-          font-optical-sizing: auto;
-          font-style: normal;
+            font-family: "Nunito", sans-serif;
+            background-color: ##0b0014;
+            height: 92vh;
+            display: flex;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+            margin-bottom: px;
         }
 
-        /* --- Layout principal --- */
         .chat-layout {
-  display: grid;
-  grid-template-columns: 1fr 350px; /* área central + lateral direita */
-  gap: 20px;
-  padding: 20px;
-  color: white;
-  margin-top: 130px; /* <---- Aumente esta margem */
-  position: relative;
-  z-index: 1;
-}
+            display: grid;
+            grid-template-columns: 320px 1fr 400px;
+            gap: 25px;
+            width: 100%;
+            padding: 25px;
+            height: 100%;
+            box-sizing: border-box;
+        }
 
-        /* --- Área do chat (esquerda) --- */
+        .sidebar {
+            background-color: #0b0014;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            height: auto;
+        }
+
+        .tabs {
+            display: flex;
+            width: 100%;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .tabs button {
+            flex: 1;
+            padding: 10px;
+            background-color: #140018;
+            border: none;
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .tabs button.active {
+            background-color: #e60073;
+        }
+
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chat-card {
+            display: flex;
+            gap: 10px;
+            background-color: #1E1E1E;
+            padding: 10px;
+            border-radius: 10px;
+            align-items: center;
+            transition:0.2s;
+            width: 300px;
+            height: 100px;
+        }
+       .chat-card strong {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+            font-weight: 700;
+        }
+
+        .chat-card:hover {
+            background-color: #5700a0;
+        }
+
+        .chat-card img {
+            width: 92px;
+            height: 92px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .chat-card button {
+            margin-top: 5px;
+        }
+
+
         .chat-area {
-          background-color: #111;
-          border-radius: 12px;
-          padding: 15px;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          height: 75vh;
+            background-color: #111;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            height: auto;
         }
 
         .messages {
-          overflow-y: auto;
-          flex-grow: 1;
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          padding: 10px;
-        }
-
-        /* Scroll customizado (chat e sugestões) */
-        .messages::-webkit-scrollbar,
-        .suggestions::-webkit-scrollbar {
-          width: 8px;
-        }
-
-        .messages::-webkit-scrollbar-thumb,
-        .suggestions::-webkit-scrollbar-thumb {
-          background-color: #e60073;
-          border-radius: 10px;
-        }
-
-        .messages::-webkit-scrollbar-track,
-        .suggestions::-webkit-scrollbar-track {
-          background: #2c2c2c;
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 10px;
         }
 
         .msg {
-          max-width: 70%;
-          padding: 8px 14px;
-          border-radius: 12px;
-          font-size: 14px;
-          word-wrap: break-word;
+            padding: 10px;
+            margin: 5px 0;
+            max-width: 70%;
+            border-radius: 10px;
+            color: #fff;
         }
 
         .msg.left {
-          align-self: flex-start;
-          background-color: #2c2c2c;
+            background-color: #24002b;
+            align-self: flex-start;
         }
 
         .msg.right {
-          align-self: flex-end;
-          background-color: #e60073;
-          color: white;
+            background-color: #e60073;
+            align-self: flex-end;
         }
 
         .chat-input {
-          display: flex;
-          gap: 10px;
-          margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 10px;
         }
 
         .chat-input input {
-          flex: 1;
-          padding: 10px;
-          border-radius: 8px;
-          border: none;
-          background-color: #2c2c2c;
-          color: white;
+            flex-grow: 1;
+            border: none;
+            color: white;
+            outline: none;
         }
 
         .chat-input button {
-          background-color: #e60073;
-          border: none;
-          border-radius: 8px;
-          color: white;
-          padding: 10px 16px;
-          cursor: pointer;
-          transition: 0.3s;
+            background-color: #e60073;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
         }
 
-        .chat-input button:hover {
-          background-color: #ff007f;
-        }
-
-        /* --- Sugestões (direita) --- */
         .suggestions {
-          background-color: #0b0014;
-          border-radius: 12px;
-          padding: 15px;
-          overflow-y: auto;
-          height: 75vh;
-          display: flex;
-          flex-direction: column;
+            background-color: #0b0014;
+            border-radius: 12px;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            height: auto;
         }
 
         .suggestions h3 {
-          text-align: center;
-          margin-bottom: 15px;
-          color: #ff007f;
+            text-align: center;
+            color: #e60073;
+            margin-bottom: 15px;
         }
 
-        /* GRID de 2 colunas */
         .suggestions-list {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 12px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
         }
 
-        /* Card individual */
-        .suggestion {
-          background-color: #2c0036;
-          border-radius: 10px;
-          padding: 10px;
-          text-align: center;
-          transition: 0.3s;
+        .suggestion-card {
+            background-color: #1E1E1E;
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .suggestion:hover {
-          transform: translateY(-3px);
-          background-color: #350047;
+        .suggestion-card:hover {
+            background-color: #5700a0;
         }
 
-        .suggestion img {
-          width: 80px;
-          height: 80px;
-          border-radius: 50%;
-          margin-bottom: 10px;
-          object-fit: cover;
+        .suggestion-card img {
+            width: 85px;
+            height: 85px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 10px;
         }
 
-        .suggestion .info .baixa {
-          color: red;
-        }
-        .suggestion .info .media {
-          color: orange;
-        }
-        .suggestion .info .alta {
-          color: limegreen;
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .enviar,
-        .excluir {
-          margin-top: 5px;
-          padding: 5px 10px;
-          border-radius: 6px;
-          cursor: pointer;
-          border: none;
-          width: 100%;
+        ::-webkit-scrollbar-thumb {
+            background: #ff0077;
+            border-radius: 10px;
         }
 
-        .enviar {
-          background-color: green;
-          color: white;
+        ::-webkit-scrollbar-track {
+            background: #0b0014;
         }
-        .excluir {
-          background-color: red;
-          color: white;
-        }
+       .suggestion-card strong {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px; /* ajuste se quiser mais ou menos espaço */
+    font-weight: 700;
+}
+
+ .suggestion-card .alta {
+  color: limegreen;
+  font-weight: 700;
+}
+
+.suggestion-card .media {
+  color: orange;
+  font-weight: 700;
+}
+
+.suggestion-card .baixa {
+  color: red;
+  font-weight: 700;
+}
+
+
     </style>
 </head>
 <body>
-
 
 <header th:if="${session.usuarioLogado != null}">
     <div class="logo-header">
@@ -208,23 +263,49 @@
 </header>
 
 <main class="chat-page">
-    <div class="tabs">
-        <button id="chats-tab" class="tab active">CHATS</button>
-        <button id="solicitacoes-tab" class="tab">SOLICITAÇÕES</button>
-    </div>
 
-    <div id="solicitacoes" class="solicitacoes" style="display:none;">
-        <div th:each="sol : ${solicitacoes}" class="sol-card">
-            <p><strong th:text="${sol.remetente.nome}"></strong> quer conversar com você.</p>
-            <form th:action="@{/responderSolicitacao}" method="post">
-                <input type="hidden" name="id" th:value="${sol.id}">
-                <button name="acao" value="aceitar" class="aceitar">Aceitar</button>
-                <button name="acao" value="negar" class="negar">Negar</button>
-            </form>
-        </div>
-    </div>
     <div class="chat-layout">
-        <!-- Coluna do chat central -->
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="tabs">
+                <button id="chats-tab" class="active">CHATS</button>
+                <button id="solicitacoes-tab">SOLICITAÇÕES</button>
+            </div>
+
+            <div id="chats-list" class="list">
+                <div class="chat-card" th:each="chat : ${chats}">
+                    <img th:src="${chat.destinatario.fotoPerfil != null ? chat.destinatario.fotoPerfil.url : '/img/user-default.png'}">
+                    <div>
+                        <p><strong th:text="${chat.destinatario.nome}"></strong></p>
+
+                        <form th:action="@{/abrirChat}" method="get">
+                            <input type="hidden" name="id" th:value="${chat.destinatario.id}">
+                            <button class="abrir">Abrir</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="solicitacoes-list" class="list" style="display:none;">
+                <div class="chat-card" th:each="sol : ${solicitacoes}">
+                    <img th:src="${sol.remetente.fotoPerfil != null ? sol.remetente.fotoPerfil.url : '/img/user-default.png'}">
+                    <div>
+                        <p><strong th:text="${sol.remetente.nome}"></strong></p>
+
+                        <form th:action="@{/responderSolicitacao}" method="post">
+                            <input type="hidden" name="id" th:value="${sol.id}">
+                            <button name="acao" value="aceitar" class="aceitar">Aceitar</button>
+                            <button name="acao" value="negar" class="negar">Negar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- CHAT CENTRAL -->
         <section class="chat-area">
             <div class="messages" id="messages">
                 <div th:each="mensagem : ${mensagens}">
@@ -240,53 +321,99 @@
             </form>
         </section>
 
-        <!-- Coluna direita - sugestões -->
+        <!-- SUGESTÕES -->
         <aside class="suggestions">
             <h3>Sugestões de pessoas pra conhecer</h3>
+
             <div class="suggestions-list">
-                <div class="suggestion" th:each="s : ${sugeridos}">
-                    <img th:src="${s.fotoPerfil != null ? s.fotoPerfil.url : '/img/user-default.png'}"
-                         alt="foto de perfil">
-                    <div class="info">
-                        <p><strong th:text="${s.nome}"></strong></p>
-                        <p>Compatibilidade:
-                            <span th:text="${compatibilidades[s.id]}"
-                                  th:classappend="${compatibilidades[s.id] == 'Alta'} ? ' alta' :
-      (${compatibilidades[s.id] == 'Média'} ? ' media' : ' baixa')">
-</span>
-                        </p>
-                        <form th:action="@{/enviarSolicitacao}" method="post">
-                            <input type="hidden" name="id" th:value="${s.id}">
-                            <button type="submit" class="enviar">Enviar</button>
-                        </form>
-                        <form th:action="@{/excluirSugestao}" method="post">
-                            <input type="hidden" name="id" th:value="${s.id}">
-                            <button type="submit" class="excluir">Excluir</button>
-                        </form>
-                    </div>
+
+                <div class="suggestion-card" th:each="s : ${sugeridos}">
+                    <img th:src="${s.fotoPerfil != null ? s.fotoPerfil.url : '/img/user-default.png'}">
+
+                    <p><strong th:text="${s.nome}"></strong></p>
+
+                    <p>Compatibilidade:
+                        <span th:text="${compatibilidades[s.id]}"
+                              th:classappend="${compatibilidades[s.id] == 'Alta'} ? 'alta' :
+                          (${compatibilidades[s.id] == 'Média'} ? 'media' : 'baixa')">
+    </span>
+                    </p>
+
+                    <form th:action="@{/enviarSolicitacao}" method="post" onsubmit="enviarSolicitacao(event, this)">
+                        <input type="hidden" name="id" th:value="${s.id}">
+                        <button type="submit" class="enviar">Enviar</button>
+                    </form>
+
+                    <form th:action="@{/excluirSugestao}" method="post">
+                        <input type="hidden" name="id" th:value="${s.id}">
+                        <button type="submit" class="excluir">Excluir</button>
+                    </form>
+
                 </div>
+
             </div>
         </aside>
+
     </div>
 </main>
-<script>
 
-const chatsTab = document.getElementById("chats-tab");
+<script>
+    const chatsTab = document.getElementById("chats-tab");
 const solicitacoesTab = document.getElementById("solicitacoes-tab");
-const solicitacoesDiv = document.getElementById("solicitacoes");
+const chatsList = document.getElementById("chats-list");
+const solicitacoesList = document.getElementById("solicitacoes-list");
 
 chatsTab.onclick = () => {
   chatsTab.classList.add("active");
   solicitacoesTab.classList.remove("active");
-  solicitacoesDiv.style.display = "none";
+  chatsList.style.display = "flex";
+  solicitacoesList.style.display = "none";
 };
 
 solicitacoesTab.onclick = () => {
   solicitacoesTab.classList.add("active");
   chatsTab.classList.remove("active");
-  solicitacoesDiv.style.display = "block";
+  chatsList.style.display = "none";
+  solicitacoesList.style.display = "flex";
 };
 
+function removerCard(form) {
+  const card = form.closest('.suggestion-card');
+  setTimeout(() => card.remove(), 300);
+}
+
+async function enviarSolicitacao(event, form) {
+  event.preventDefault(); // impede reload
+
+  const botao = form.querySelector('.enviar');
+  botao.disabled = true;
+  botao.textContent = 'Enviando...';
+
+  try {
+    const response = await fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form)
+    });
+
+    const result = await response.text();
+
+    if (result === 'ok') {
+      form.closest('.suggestion-card').remove();
+    } else if (result === 'jaExiste') {
+      botao.textContent = 'Já enviada';
+    } else {
+      botao.textContent = 'Erro';
+      botao.disabled = false;
+    }
+
+  } catch (e) {
+    botao.textContent = 'Erro';
+    botao.disabled = false;
+    console.error(e);
+  }
+}
+
 </script>
+
 </body>
 </html>

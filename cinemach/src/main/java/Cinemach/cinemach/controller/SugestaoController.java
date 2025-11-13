@@ -1,5 +1,6 @@
 package Cinemach.cinemach.controller;
 
+import Cinemach.cinemach.dto.ChatEntry;
 import Cinemach.cinemach.model.Usuario;
 import Cinemach.cinemach.model.FilmeSalvo;
 import Cinemach.cinemach.repository.SolicitacaoRepository;
@@ -38,7 +39,7 @@ public class SugestaoController {
             return "login";
         }
 
-
+        // remove bloqueios expirados
         bloqueadaRepository.findByUsuario(usuarioLogado).forEach(b -> {
             if (b.getExpiracao().isBefore(LocalDateTime.now())) {
                 bloqueadaRepository.delete(b);
@@ -49,14 +50,28 @@ public class SugestaoController {
                 .filter(u -> !u.getId().equals(usuarioLogado.getId()))
                 .collect(Collectors.toList());
 
-
         List<Long> bloqueados = bloqueadaRepository.findByUsuario(usuarioLogado)
                 .stream().map(b -> b.getBloqueado().getId()).toList();
 
         boolean usuarioTemFilmes = temFilmes(usuarioLogado);
 
+        // 🔹 Pegar solicitações PENDENTES ou ACEITAS do usuário logado
+        List<Solicitacao> solicitacoesRelacionadas =
+                solicitacaoRepository.findByRemetenteOrDestinatario(usuarioLogado, usuarioLogado);
+
+        // 🔹 IDs de usuários que já têm solicitação pendente ou aceita com o logado
+        Set<Long> usuariosComSolicitacaoAtiva = solicitacoesRelacionadas.stream()
+                .filter(s -> s.getStatus().equals("PENDENTE") || s.getStatus().equals("ACEITA"))
+                .map(s -> {
+                    if (s.getRemetente().equals(usuarioLogado)) return s.getDestinatario().getId();
+                    else return s.getRemetente().getId();
+                })
+                .collect(Collectors.toSet());
+
+        // 🔹 Gerar lista de sugestões filtrando bloqueados e solicitações ativas
         List<Usuario> sugeridos = todosUsuarios.stream()
                 .filter(u -> !bloqueados.contains(u.getId()))
+                .filter(u -> !usuariosComSolicitacaoAtiva.contains(u.getId()))
                 .filter(u -> {
                     int generosEmComum = calcularPorGeneros(usuarioLogado, u);
                     if (generosEmComum == 0) return false;
@@ -77,10 +92,25 @@ public class SugestaoController {
             compatibilidades.put(u.getId(), calcularCompatibilidade(usuarioLogado, u));
         }
 
-
         List<Solicitacao> solicitacoesPendentes =
                 solicitacaoRepository.findByDestinatarioAndStatus(usuarioLogado, "PENDENTE");
 
+        List<Solicitacao> solicitacoesAceitas = solicitacaoRepository.findChatsAtivos(usuarioLogado);
+
+        List<ChatEntry> chatsAtivos = new ArrayList<>();
+        for (Solicitacao s : solicitacoesAceitas) {
+            Usuario outro = s.getRemetente().getId().equals(usuarioLogado.getId())
+                    ? s.getDestinatario()
+                    : s.getRemetente();
+
+            boolean jaTem = chatsAtivos.stream()
+                    .anyMatch(c -> c.getDestinatario().getId().equals(outro.getId()));
+            if (!jaTem) {
+                chatsAtivos.add(new ChatEntry(outro));
+            }
+        }
+
+        model.addAttribute("chats", chatsAtivos);
         model.addAttribute("usuarioLogado", usuarioLogado);
         model.addAttribute("sugeridos", sugeridos);
         model.addAttribute("compatibilidades", compatibilidades);
@@ -89,26 +119,25 @@ public class SugestaoController {
         return "chat";
     }
 
-    @PostMapping("/enviarSolicitacao")
-    public String enviarSolicitacao(@RequestParam Long id, HttpSession session) {
-        Usuario remetente = (Usuario) session.getAttribute("usuarioLogado");
-        Usuario destinatario = usuarioRepository.findById(id).orElse(null);
-        if (remetente != null && destinatario != null) {
-            Solicitacao s = new Solicitacao();
-            s.setRemetente(remetente);
-            s.setDestinatario(destinatario);
-            solicitacaoRepository.save(s);
-        }
-        return "redirect:/chat";
-    }
-
     @PostMapping("/responderSolicitacao")
     public String responderSolicitacao(@RequestParam Long id, @RequestParam String acao) {
         Solicitacao s = solicitacaoRepository.findById(id).orElse(null);
         if (s != null) {
-            if (acao.equals("aceitar")) s.setStatus("ACEITA");
-            else s.setStatus("NEGADA");
-            solicitacaoRepository.save(s);
+            if (acao.equals("aceitar")) {
+                s.setStatus("ACEITA");
+                solicitacaoRepository.save(s);
+            } else {
+                s.setStatus("NEGADA");
+                solicitacaoRepository.save(s);
+
+                Usuario remetente = s.getRemetente();
+                Usuario destinatario = s.getDestinatario();
+                SugestaoBloqueada b1 = new SugestaoBloqueada(remetente, destinatario, LocalDateTime.now().plusDays(7));
+                SugestaoBloqueada b2 = new SugestaoBloqueada(destinatario, remetente, LocalDateTime.now().plusDays(7));
+                bloqueadaRepository.save(b1);
+                bloqueadaRepository.save(b2);
+                solicitacaoRepository.delete(s);
+            }
         }
         return "redirect:/chat";
     }
@@ -206,5 +235,45 @@ public class SugestaoController {
 
     private boolean temFilmes(Usuario u) {
         return !filmeSalvoRepository.findByUsuarioId(u.getId()).isEmpty();
+    }
+
+    @PostMapping("/enviarSolicitacao")
+    @ResponseBody
+    public String enviarSolicitacao(@RequestParam Long id, HttpSession session) {
+        Usuario remetente = (Usuario) session.getAttribute("usuarioLogado");
+        Usuario destinatario = usuarioRepository.findById(id).orElse(null);
+
+        if (remetente == null || destinatario == null) {
+            return "erro";
+        }
+
+        // Já existe solicitação ativa entre os dois?
+        boolean existe = solicitacaoRepository.findByRemetenteOrDestinatario(remetente, destinatario)
+                .stream()
+                .anyMatch(s ->
+                        ((s.getRemetente().equals(remetente) && s.getDestinatario().equals(destinatario)) ||
+                                (s.getRemetente().equals(destinatario) && s.getDestinatario().equals(remetente)))
+                                && (s.getStatus().equals("PENDENTE") || s.getStatus().equals("ACEITA"))
+                );
+
+        if (existe) {
+            return "jaExiste";
+        }
+
+        // Criar nova solicitação
+        Solicitacao nova = new Solicitacao();
+        nova.setRemetente(remetente);
+        nova.setDestinatario(destinatario);
+        solicitacaoRepository.save(nova);
+
+        // 🔒 BLOQUEIA SUGESTÃO PARA AMBOS POR 7 DIAS
+        if (!bloqueadaRepository.existsByUsuarioAndBloqueado(remetente, destinatario)) {
+            bloqueadaRepository.save(new SugestaoBloqueada(remetente, destinatario, LocalDateTime.now().plusDays(7)));
+        }
+        if (!bloqueadaRepository.existsByUsuarioAndBloqueado(destinatario, remetente)) {
+            bloqueadaRepository.save(new SugestaoBloqueada(destinatario, remetente, LocalDateTime.now().plusDays(7)));
+        }
+
+        return "ok";
     }
 }

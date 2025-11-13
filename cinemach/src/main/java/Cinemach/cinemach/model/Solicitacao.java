@@ -16,7 +16,7 @@ public class Solicitacao {
     @ManyToOne
     private Usuario destinatario;
 
-    private String status; // PENDENTE, ACEITA, NEGADA
+    private String status;
     private LocalDateTime dataEnvio;
 
     public Solicitacao() {
