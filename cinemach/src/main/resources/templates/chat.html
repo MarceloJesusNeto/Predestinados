@@ -13,13 +13,12 @@
     <style>
         main {
             font-family: "Nunito", sans-serif;
-            background-color: ##0b0014;
+            background-color: #0b0014;
             height: 92vh;
             display: flex;
             justify-content: center;
             padding: 0;
             margin: 0;
-            margin-bottom: px;
         }
 
         .chat-layout {
@@ -39,7 +38,7 @@
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            height: auto;
+            height: 100%;
         }
 
         .tabs {
@@ -57,109 +56,244 @@
             color: #fff;
             border-radius: 8px;
             cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
         .tabs button.active {
             background-color: #e60073;
         }
 
+        .tabs button:hover {
+            background-color: #5700a0;
+        }
+
         .list {
             display: flex;
             flex-direction: column;
             gap: 15px;
+            flex: 1;
+            overflow-y: auto;
         }
 
+        /* CARD DE CHAT ATUALIZADO - ESTILO DA IMAGEM */
         .chat-card {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             background-color: #1E1E1E;
-            padding: 10px;
-            border-radius: 10px;
-            align-items: center;
-            transition:0.2s;
-            width: 300px;
-            height: 100px;
-        }
-       .chat-card strong {
-            display: block;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 120px;
-            font-weight: 700;
+            padding: 15px;
+            border-radius: 12px;
+            align-items: flex-start;
+            transition: all 0.3s ease;
+            width: 100%;
+            min-height: 80px;
+            border: 1px solid #2a2a2a;
+            cursor: pointer;
+            position: relative;
+            box-sizing: border-box;
         }
 
         .chat-card:hover {
             background-color: #5700a0;
+            transform: translateY(-2px);
         }
 
         .chat-card img {
-            width: 92px;
-            height: 92px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e60073;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .chat-card .content {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .chat-card strong {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            font-weight: 700;
+            color: white;
+            text-align: left;
+            font-size: 16px;
+            line-height: 1.2;
+        }
+
+        .ultima-msg {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            font-weight: 400;
+            color: #aaa;
+            text-align: left;
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.3;
+        }
+
+        .chat-card button {
+            background-color: #e60073;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s ease;
+        }
+
+        .chat-card button:hover {
+            background-color: #ff1493;
+        }
+
+        /* CHAT CENTRAL MELHORADO */
+        .chat-area {
+            background-color: #0b0014;
+            border-radius: 12px;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            border: 1px solid #111;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background-color: #1a0024;
+            padding: 15px 20px;
+            border-bottom: 1px solid #2a2a2a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-header img {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             object-fit: cover;
         }
 
-        .chat-card button {
-            margin-top: 5px;
+        .chat-header strong {
+            color: white;
+            font-size: 16px;
         }
 
-
-        .chat-area {
-            background-color: #111;
-            border-radius: 12px;
-            padding: 15px;
+        .messages-container {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            height: auto;
+            padding: 20px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0b0014 0%, #1a0024 100%);
         }
 
         .messages {
-            flex-grow: 1;
+            flex: 1;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             padding-right: 10px;
+            max-height: calc(100vh - 250px);
+        }
+
+        /* ESTILO DAS MENSAGENS - WHATSAPP STYLE */
+        .message-row {
+            display: flex;
+            width: 100%;
+        }
+
+        .message-row.right {
+            justify-content: flex-end;
+        }
+
+        .message-row.left {
+            justify-content: flex-start;
         }
 
         .msg {
-            padding: 10px;
-            margin: 5px 0;
+            padding: 12px 16px;
+            margin: 2px 0;
+            border-radius: 18px;
+            color: white;
             max-width: 70%;
-            border-radius: 10px;
-            color: #fff;
+            word-wrap: break-word;
+            position: relative;
+            animation: fadeIn 0.3s ease;
         }
 
         .msg.left {
             background-color: #24002b;
-            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #3a0044;
         }
 
         .msg.right {
             background-color: #e60073;
-            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            border: 1px solid #ff1493;
+        }
+
+        .msg-time {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .chat-input-container {
+            background-color: #1a0024;
+            padding: 15px 20px;
+            border-top: 1px solid #2a2a2a;
         }
 
         .chat-input {
             display: flex;
             gap: 10px;
-            padding: 10px;
-            border-radius: 10px;
-            margin-top: 10px;
+            align-items: center;
         }
 
         .chat-input input {
             flex-grow: 1;
             border: none;
+            background-color: #2a0038;
             color: white;
             outline: none;
+            padding: 12px 16px;
+            border-radius: 24px;
+            font-size: 14px;
+        }
+
+        .chat-input input::placeholder {
+            color: #aaa;
         }
 
         .chat-input button {
             background-color: #e60073;
             border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
+            padding: 12px 20px;
+            border-radius: 24px;
             color: white;
             cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background-color: #ff1493;
         }
 
         .suggestions {
@@ -169,81 +303,884 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            height: auto;
+            height: 100%;
+            border: 0px solid #2a2a2a;
+        }
+
+        .suggestions strong {
+            font-size:18px;
         }
 
         .suggestions h3 {
             text-align: center;
             color: #e60073;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            font-size: 16px;
         }
 
         .suggestions-list {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            display: flex;
+            flex-direction: column;
             gap: 15px;
+            flex: 1;
+            overflow-y: auto;
+            padding: 5px;
         }
 
         .suggestion-card {
             background-color: #1E1E1E;
             border-radius: 12px;
-            padding: 10px;
-            text-align: center;
-            transition: 0.2s;
+            padding: 15px;
+            transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 12px;
+            border: 1px solid #2a2a2a;
+            width: 100%;
+            box-sizing: border-box;
+            cursor: pointer;
+            position: relative;
         }
 
-        .suggestion-card:hover {
+         .suggestion-card:hover {
             background-color: #5700a0;
+            transform: translateY(-2px);
         }
 
         .suggestion-card img {
-            width: 85px;
-            height: 85px;
+            width: 100px;
+            height: 100px;
             object-fit: cover;
             border-radius: 50%;
-            margin-bottom: 10px;
+            border: 2px solid #e60073;
+            display: block;
+            margin: 0 auto;
         }
 
+        .suggestion-card strong {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .compatibilidade {
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .alta { color: limegreen; font-weight: 700; }
+        .media { color: orange; font-weight: 700; }
+        .baixa { color: #ff4444; font-weight: 700; }
+
+        .suggestion-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 5px;
+            width: 100%;
+            justify-content: center;
+            pointer-events: auto;
+        }
+
+        .suggestion-buttons button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 100px;
+        }
+
+         .suggestion-buttons .enviar {
+            background-color: #e60073;
+            color: white;
+        }
+
+        .suggestion-buttons .excluir {
+            background-color: #444;
+            color: white;
+        }
+
+        .suggestion-buttons button:hover {
+            transform: scale(1.05);
+        }
+
+        .suggestion-card.enviando .suggestion-buttons .enviar,
+        .suggestion-card.excluindo .suggestion-buttons .excluir {
+            position: relative;
+            color: transparent;
+        }
+
+         .suggestion-card.enviando .suggestion-buttons .enviar::after,
+        .suggestion-card.excluindo .suggestion-buttons .excluir::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin: -8px 0 0 -8px;
+            border: 2px solid transparent;
+            border-top: 2px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* SCROLLBAR PERSONALIZADA */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #ff0077;
+            background: #e60073;
             border-radius: 10px;
         }
 
         ::-webkit-scrollbar-track {
-            background: #0b0014;
+            background: #1a0024;
+            border-radius: 10px;
         }
-       .suggestion-card strong {
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 120px; /* ajuste se quiser mais ou menos espaço */
-    font-weight: 700;
-}
 
- .suggestion-card .alta {
-  color: limegreen;
-  font-weight: 700;
-}
+        /* ANIMAÇÃO */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-.suggestion-card .media {
-  color: orange;
-  font-weight: 700;
-}
+        /* ESTADO QUANDO NÃO HÁ CHAT SELECIONADO */
+        .no-chat-selected {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+            text-align: center;
+            padding: 40px;
+        }
 
-.suggestion-card .baixa {
-  color: red;
-  font-weight: 700;
-}
+        .no-chat-selected i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #e60073;
+        }
 
+        .chat-actions {
+            display: none;
+        }
 
+        .chat-card:hover::after {
+            opacity: 1;
+            transform: translateY(-50%) translateX(3px);
+        }
+
+        .chat-card::after {
+            content: "→";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #e60073;
+            font-size: 18px;
+            font-weight: bold;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .chat-actions form {
+            margin: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .chat-actions .abrir {
+            background-color: #e60073;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            width: 80px;
+            text-align: center;
+        }
+
+        .chat-actions .excluir-match {
+            background-color: #ff4444;
+            border: none;
+            padding: 6px 8px;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-actions .excluir-match:hover {
+            background-color: #cc0000;
+            transform: scale(1.1);
+        }
+
+        .chat-actions .abrir:hover {
+            background-color: #ff1493;
+            transform: scale(1.05);
+        }
+
+        .excluir-match-header {
+            background-color: #ff4444;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .excluir-match-header:hover {
+            background-color: #cc0000;
+        }
+
+        /* MODAL DE DETALHES DO USUÁRIO */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #0b0014 0%, #1a0024 100%);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: hidden;
+            border: 2px solid #e60073;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+            position: relative;
+            animation: modalSlideIn 0.4s ease-out;
+            display: flex;
+            flex-direction: column;
+            font-family: "Nunito", sans-serif;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-60px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(230, 0, 115, 0.2);
+            border: none;
+            color: #fff;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-close:hover {
+            color: #e60073;
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .modal-user-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 0 10px;
+        }
+
+        .modal-user-img {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #e60073;
+            margin-bottom: 25px;
+            box-shadow: 0 12px 30px rgba(230, 0, 115, 0.4);
+        }
+
+        .modal-user-name {
+            color: white;
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 12px;
+            line-height: 1.2;
+            text-align: center;
+            word-wrap: break-word;
+            max-width: 100%;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-compatibilidade {
+            font-size: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            padding: 10px 20px;
+            background: rgba(230, 0, 115, 0.15);
+            border-radius: 25px;
+            border: 1px solid rgba(230, 0, 115, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-compatibilidade .alta {
+            color: #00ff88;
+            font-weight: 800;
+            text-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
+        }
+        .modal-compatibilidade .media {
+            color: #ffaa00;
+            font-weight: 800;
+            text-shadow: 0 0 10px rgba(255, 170, 0, 0.5);
+        }
+        .modal-compatibilidade .baixa {
+            color: #ff4444;
+            font-weight: 800;
+            text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+        }
+
+        .modal-descricao {
+            background: linear-gradient(135deg, #1a0024 0%, #24002b 100%);
+            padding: 30px;
+            border-radius: 18px;
+            margin-bottom: 30px;
+            border: 1px solid #3a0044;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 150px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .modal-descricao h4 {
+            color: #e60073;
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: 800;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .modal-descricao p {
+            color: #e0e0e0;
+            line-height: 1.7;
+            font-size: 17px;
+            text-align: center;
+            margin: 0;
+            word-wrap: break-word;
+            max-width: 100%;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-descricao p:empty::before {
+            content: "Este usuário ainda não adicionou uma descrição.";
+            color: #888;
+            font-style: italic;
+            font-size: 16px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: auto;
+        }
+
+        .modal-actions .enviar {
+            background: linear-gradient(135deg, #e60073 0%, #ff1493 100%);
+            border: none;
+            padding: 16px 32px;
+            border-radius: 15px;
+            color: white;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 17px;
+            transition: all 0.3s ease;
+            min-width: 180px;
+            box-shadow: 0 6px 20px rgba(230, 0, 115, 0.5);
+            letter-spacing: 0.5px;
+        }
+
+        .modal-actions .enviar:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(230, 0, 115, 0.7);
+            background: linear-gradient(135deg, #ff1493 0%, #e60073 100%);
+        }
+
+        .modal-actions .excluir {
+            background: linear-gradient(135deg, #444 0%, #666 100%);
+            border: none;
+            padding: 16px 32px;
+            border-radius: 15px;
+            color: white;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 17px;
+            transition: all 0.3s ease;
+            min-width: 180px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            letter-spacing: 0.5px;
+        }
+
+        .modal-actions .excluir:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            background: linear-gradient(135deg, #666 0%, #444 100%);
+        }
+
+        .modal-descricao::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-descricao::-webkit-scrollbar-thumb {
+            background: #e60073;
+            border-radius: 10px;
+        }
+
+        .modal-descricao::-webkit-scrollbar-track {
+            background: #1a0024;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 30px 25px;
+                margin: 10px;
+                max-height: 85vh;
+                width: 95%;
+            }
+
+            .modal-user-img {
+                width: 130px;
+                height: 130px;
+            }
+
+            .modal-user-name {
+                font-size: 26px;
+            }
+
+            .modal-compatibilidade {
+                font-size: 18px;
+            }
+
+            .modal-descricao {
+                padding: 25px;
+                min-height: 150px;
+                max-height: 300px;
+                overflow-y: auto;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+
+            .modal-descricao h4 {
+                font-size: 20px;
+                width: 100%;
+            }
+
+            .modal-descricao p {
+                font-size: 16px;
+                text-align: left;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                max-width: 100%;
+                display: block;
+                white-space: normal;
+                word-break: break-word;
+                hyphens: auto;
+                padding: 0 5px;
+            }
+
+            .modal-descricao p:empty::before {
+                font-size: 16px;
+                text-align: center;
+                width: 100%;
+                display: block;
+            }
+
+            .modal-actions .enviar,
+            .modal-actions .excluir {
+                width: 100%;
+                max-width: 250px;
+                padding: 14px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-content {
+                padding: 35px;
+                width: 90%;
+                max-width: 600px;
+                max-height: 90vh;
+                word-wrap: break-word;
+            }
+
+            .modal-user-img {
+                width: 110px;
+                height: 110px;
+            }
+
+            .modal-user-name {
+                font-size: 24px;
+            }
+
+            .modal-compatibilidade {
+                font-size: 16px;
+                padding: 8px 16px;
+            }
+        }
+
+        .modal-actions button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .modal-actions button.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .modal-actions button.loading::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            top: 50%;
+            left: 50%;
+            margin: -11px 0 0 -11px;
+            border: 2px solid transparent;
+            border-top: 2px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .suggestion-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-card:hover {
+            background-color: #5700a0;
+            transform: translateY(-2px);
+        }
+
+        .suggestion-card .card-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .suggestion-buttons {
+            pointer-events: auto;
+        }
+
+        @media (max-width: 1200px) {
+            .chat-layout {
+                grid-template-columns: 280px 1fr 350px;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .suggestion-card img {
+                width: 90px;
+                height: 90px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .chat-layout {
+                grid-template-columns: 250px 1fr 300px;
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .suggestion-card {
+                padding: 12px;
+            }
+
+            .suggestion-card img {
+                width: 80px;
+                height: 80px;
+            }
+
+            .suggestion-card strong {
+                font-size: 14px;
+            }
+
+            .compatibilidade {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 25px 20px;
+                margin: 10px;
+                max-height: 85vh;
+                width: 95%;
+            }
+
+            .modal-user-img {
+                width: 120px;
+                height: 120px;
+            }
+
+            .modal-user-name {
+                font-size: 24px;
+            }
+
+            .modal-compatibilidade {
+                font-size: 16px;
+            }
+
+            .modal-descricao {
+                padding: 20px;
+                min-height: 120px;
+            }
+
+            .modal-descricao h4 {
+                font-size: 18px;
+            }
+
+            .modal-descricao p {
+                font-size: 15px;
+                line-height: 1.6;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .modal-actions .enviar,
+            .modal-actions .excluir {
+                width: 100%;
+                max-width: 250px;
+                padding: 14px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-content {
+                padding: 20px 15px;
+            }
+
+            .modal-user-img {
+                width: 100px;
+                height: 100px;
+            }
+
+            .modal-user-name {
+                font-size: 22px;
+            }
+
+            .modal-compatibilidade {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+
+            .modal-descricao {
+                padding: 15px;
+            }
+
+            .modal-descricao p {
+                font-size: 14px;
+            }
+        }
+
+        #chats-list .chat-card {
+            display: flex;
+            flex-direction: row;
+            text-align: left;
+            padding: 15px;
+            align-items: flex-start;
+        }
+
+        #chats-list .chat-card img {
+            margin: 0;
+        }
+
+        #chats-list .chat-card .content {
+            width: 100%;
+        }
+
+        #solicitacoes-list .chat-card {
+            cursor: default;
+        }
+
+        #solicitacoes-list .chat-card img {
+            margin: 0 auto 8px auto;
+        }
+
+        #solicitacoes-list .chat-card .content {
+            width: 100%;
+        }
+
+        #solicitacoes-list .chat-card::after {
+            display: none;
+        }
+
+        #solicitacoes-list .chat-card form {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        #solicitacoes-list .chat-card .aceitar {
+            background-color: #00cc66;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        #solicitacoes-list .chat-card .aceitar:hover {
+            background-color: #00ff88;
+            transform: scale(1.05);
+        }
+
+        #solicitacoes-list .chat-card .negar {
+            background-color: #ff4444;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        #solicitacoes-list .chat-card .negar:hover {
+            background-color: #ff6666;
+            transform: scale(1.05);
+        }
+
+        #solicitacoes-list .chat-card form {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 1200px) {
+            .chat-layout {
+                grid-template-columns: 280px 1fr 350px;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .chat-card img {
+                width: 45px;
+                height: 45px;
+            }
+
+            .chat-card strong {
+                font-size: 15px;
+            }
+
+            .ultima-msg {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .chat-layout {
+                grid-template-columns: 250px 1fr 300px;
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .chat-card {
+                padding: 12px;
+            }
+
+            .chat-card img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .chat-card strong {
+                font-size: 14px;
+            }
+
+            .ultima-msg {
+                font-size: 11px;
+            }
+
+            .chat-actions .abrir {
+                padding: 6px 12px;
+                font-size: 11px;
+                width: 70px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -275,15 +1212,12 @@
             </div>
 
             <div id="chats-list" class="list">
-                <div class="chat-card" th:each="chat : ${chats}">
+                <div class="chat-card" th:each="chat : ${chats}" onclick="abrirChat(this)"
+                     th:attr="data-chat-id=${chat.destinatario.id}">
                     <img th:src="${chat.destinatario.fotoPerfil != null ? chat.destinatario.fotoPerfil.url : '/img/user-default.png'}">
-                    <div>
-                        <p><strong th:text="${chat.destinatario.nome}"></strong></p>
-
-                        <form th:action="@{/abrirChat}" method="get">
-                            <input type="hidden" name="id" th:value="${chat.destinatario.id}">
-                            <button class="abrir">Abrir</button>
-                        </form>
+                    <div class="content">
+                        <strong th:text="${chat.destinatario.nome}"></strong>
+                        <p class="ultima-msg" th:text="${chat.ultimaMensagem} ?: 'Nenhuma mensagem ainda'"></p>
                     </div>
                 </div>
             </div>
@@ -291,8 +1225,8 @@
             <div id="solicitacoes-list" class="list" style="display:none;">
                 <div class="chat-card" th:each="sol : ${solicitacoes}">
                     <img th:src="${sol.remetente.fotoPerfil != null ? sol.remetente.fotoPerfil.url : '/img/user-default.png'}">
-                    <div>
-                        <p><strong th:text="${sol.remetente.nome}"></strong></p>
+                    <div class="content">
+                        <strong th:text="${sol.remetente.nome}"></strong>
 
                         <form th:action="@{/responderSolicitacao}" method="post">
                             <input type="hidden" name="id" th:value="${sol.id}">
@@ -307,18 +1241,68 @@
 
         <!-- CHAT CENTRAL -->
         <section class="chat-area">
-            <div class="messages" id="messages">
-                <div th:each="mensagem : ${mensagens}">
-                    <div th:classappend="${mensagem.remetente.id == session.usuarioLogado.id} ? 'msg right' : 'msg left'"
-                         th:text="${mensagem.conteudo}"></div>
+            <!-- Header do Chat -->
+            <div class="chat-header" th:if="${destinatario != null}">
+                <img th:src="${destinatario.fotoPerfil != null ? destinatario.fotoPerfil.url : '/img/user-default.png'}"
+                     alt="Foto do usuário">
+                <strong th:text="${destinatario.nome}"></strong>
+
+                <div style="margin-left: auto;">
+                    <form th:action="@{/excluirMatch}" method="post"
+                          onsubmit="return confirm('Tem certeza que deseja excluir este match? Todas as mensagens serão perdidas.')">
+                        <input type="hidden" name="usuarioId" th:value="${destinatario.id}">
+                        <button type="submit" class="excluir-match-header" title="Excluir match">
+                            <i class="fa-solid fa-trash"></i> Excluir Match
+                        </button>
+                    </form>
                 </div>
             </div>
 
-            <form class="chat-input" th:action="@{/enviarMensagem}" method="post">
-                <input type="hidden" name="destinatarioId" th:value="${destinatarioId}" />
-                <input type="text" name="conteudo" placeholder="Digite..." required />
-                <button type="submit">Enviar</button>
-            </form>
+            <div class="chat-header" th:unless="${destinatario != null}">
+                <strong>Selecione um chat para começar</strong>
+            </div>
+
+            <!-- Área de Mensagens -->
+            <div class="messages-container">
+                <div class="messages" id="messages">
+                    <!-- Estado quando não há chat selecionado -->
+                    <div class="no-chat-selected" th:unless="${destinatario != null}">
+                        <i class="fa-solid fa-comments"></i>
+                        <h3>Nenhum chat selecionado</h3>
+                        <p>Escolha uma conversa na lista ao lado para começar a trocar mensagens</p>
+                    </div>
+
+                    <!-- Mensagens do chat -->
+                    <div th:if="${destinatario != null}">
+                        <div th:each="mensagem : ${mensagens}"
+                             th:classappend="${mensagem.remetente.id == session.usuarioLogado.id} ? 'message-row right' : 'message-row left'">
+                            <div th:classappend="${mensagem.remetente.id == session.usuarioLogado.id} ? 'msg right' : 'msg left'">
+                                <div th:text="${mensagem.conteudo}"></div>
+                                <div class="msg-time" th:text="${#temporals.format(mensagem.dataEnvio, 'HH:mm')}"></div>
+                            </div>
+                        </div>
+
+                        <!-- Estado quando não há mensagens -->
+                        <div th:if="${mensagens.empty}" class="no-chat-selected">
+                            <i class="fa-solid fa-comment-slash"></i>
+                            <h3>Nenhuma mensagem ainda</h3>
+                            <p>Envie a primeira mensagem para iniciar a conversa!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input de Mensagem -->
+            <div class="chat-input-container" th:if="${destinatario != null}">
+                <form class="chat-input" th:action="@{/enviarMensagem}" method="post">
+                    <input type="hidden" name="destinatarioId" th:value="${destinatarioId}" />
+                    <input type="text" name="conteudo" placeholder="Digite sua mensagem..." required
+                           autocomplete="off" maxlength="1000" />
+                    <button type="submit">
+                        <i class="fa-solid fa-paper-plane"></i> Enviar
+                    </button>
+                </form>
+            </div>
         </section>
 
         <!-- SUGESTÕES -->
@@ -326,93 +1310,530 @@
             <h3>Sugestões de pessoas pra conhecer</h3>
 
             <div class="suggestions-list">
-
-                <div class="suggestion-card" th:each="s : ${sugeridos}">
-                    <img th:src="${s.fotoPerfil != null ? s.fotoPerfil.url : '/img/user-default.png'}">
-
-                    <p><strong th:text="${s.nome}"></strong></p>
-
-                    <p>Compatibilidade:
-                        <span th:text="${compatibilidades[s.id]}"
-                              th:classappend="${compatibilidades[s.id] == 'Alta'} ? 'alta' :
-                          (${compatibilidades[s.id] == 'Média'} ? 'media' : 'baixa')">
-    </span>
-                    </p>
-
-                    <form th:action="@{/enviarSolicitacao}" method="post" onsubmit="enviarSolicitacao(event, this)">
-                        <input type="hidden" name="id" th:value="${s.id}">
-                        <button type="submit" class="enviar">Enviar</button>
-                    </form>
-
-                    <form th:action="@{/excluirSugestao}" method="post">
-                        <input type="hidden" name="id" th:value="${s.id}">
-                        <button type="submit" class="excluir">Excluir</button>
-                    </form>
-
+                <!-- Mensagem quando não há sugestões -->
+                <div th:if="${sugeridos == null or sugeridos.empty}" class="no-suggestions"
+                     style="text-align: center; color: #666; padding: 40px;">
+                    <i class="fa-solid fa-users" style="font-size: 48px; margin-bottom: 15px; color: #e60073;"></i>
+                    <h4>Nenhuma sugestão no momento</h4>
+                    <p>As sugestões aparecerão aqui quando houver usuários compatíveis disponíveis.</p>
                 </div>
 
+                <!-- Lista de sugestões com layout corrigido -->
+                <div class="suggestion-card" th:each="s : ${sugeridos}"
+                     th:attr="data-user-id=${s.id},
+              data-user-name=${s.nome},
+              data-user-img=${s.fotoPerfil != null ? s.fotoPerfil.url : '/img/user-default.png'},
+              data-user-compat=${compatibilidades[s.id]},
+              data-user-desc=${s.descricao != null ? s.descricao : 'Este usuário ainda não adicionou uma descrição.'}">
+                    <div class="card-content">
+                        <img th:src="${s.fotoPerfil != null ? s.fotoPerfil.url : '/img/user-default.png'}"
+                             th:alt="${s.nome}">
+                        <strong th:text="${s.nome}"></strong>
+                        <div class="compatibilidade">
+                            Compatibilidade:
+                            <span th:text="${compatibilidades[s.id]}"
+                                  th:classappend="${compatibilidades[s.id] == 'Alta'} ? 'alta' :
+                                    (${compatibilidades[s.id] == 'Média'} ? 'media' : 'baixa')">
+                    </span>
+                        </div>
+                    </div>
+
+                    <div class="suggestion-buttons">
+                        <form th:action="@{/enviarSolicitacao}" method="post" onsubmit="enviarSolicitacao(event, this)">
+                            <input type="hidden" name="id" th:value="${s.id}">
+                            <button type="submit" class="enviar">Enviar</button>
+                        </form>
+
+                        <form th:action="@{/excluirSugestao}" method="post" onsubmit="removerCard(this)">
+                            <input type="hidden" name="id" th:value="${s.id}">
+                            <button type="submit" class="excluir">Excluir</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </aside>
-
     </div>
 </main>
 
+<div id="userModal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="modal-close" onclick="fecharModal()">&times;</button>
+
+        <div class="modal-user-header">
+            <img id="modalUserImg" src="" class="modal-user-img" alt="Foto do usuário">
+            <h2 id="modalUserName" class="modal-user-name"></h2>
+            <div id="modalUserCompat" class="modal-compatibilidade"></div>
+        </div>
+
+        <div class="modal-descricao">
+            <h4>Sobre mim</h4>
+            <p id="modalUserDesc"></p>
+        </div>
+
+        <div class="modal-actions">
+            <form id="modalEnviarForm" action="/enviarSolicitacao" method="post" onsubmit="enviarSolicitacao(event, this)">
+                <input type="hidden" name="id" id="modalUserId">
+                <button type="submit" class="enviar">Enviar Solicitação</button>
+            </form>
+
+            <form id="modalExcluirForm" action="/excluirSugestao" method="post" onsubmit="removerCard(this)">
+                <input type="hidden" name="id" id="modalExcluirId">
+                <button type="submit" class="excluir">Excluir Sugestão</button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     const chatsTab = document.getElementById("chats-tab");
-const solicitacoesTab = document.getElementById("solicitacoes-tab");
-const chatsList = document.getElementById("chats-list");
-const solicitacoesList = document.getElementById("solicitacoes-list");
+    const solicitacoesTab = document.getElementById("solicitacoes-tab");
+    const chatsList = document.getElementById("chats-list");
+    const solicitacoesList = document.getElementById("solicitacoes-list");
 
-chatsTab.onclick = () => {
-  chatsTab.classList.add("active");
-  solicitacoesTab.classList.remove("active");
-  chatsList.style.display = "flex";
-  solicitacoesList.style.display = "none";
-};
+    chatsTab.onclick = () => {
+        chatsTab.classList.add("active");
+        solicitacoesTab.classList.remove("active");
+        chatsList.style.display = "flex";
+        solicitacoesList.style.display = "none";
+    };
 
-solicitacoesTab.onclick = () => {
-  solicitacoesTab.classList.add("active");
-  chatsTab.classList.remove("active");
-  chatsList.style.display = "none";
-  solicitacoesList.style.display = "flex";
-};
+    solicitacoesTab.onclick = () => {
+        solicitacoesTab.classList.add("active");
+        chatsTab.classList.remove("active");
+        chatsList.style.display = "none";
+        solicitacoesList.style.display = "flex";
+    };
 
-function removerCard(form) {
-  const card = form.closest('.suggestion-card');
-  setTimeout(() => card.remove(), 300);
-}
+    function removerCard(form) {
+        event.preventDefault();
+        const card = form.closest('.suggestion-card');
+        const botao = form.querySelector('.excluir');
 
-async function enviarSolicitacao(event, form) {
-  event.preventDefault(); // impede reload
+        // Feedback visual imediato
+        botao.disabled = true;
+        botao.textContent = 'Excluindo...';
+        card.classList.add('excluindo');
 
-  const botao = form.querySelector('.enviar');
-  botao.disabled = true;
-  botao.textContent = 'Enviando...';
+        // Animação de remoção
+        card.style.opacity = '0';
+        card.style.transform = 'translateX(-100px)';
 
-  try {
-    const response = await fetch(form.action, {
-      method: 'POST',
-      body: new FormData(form)
-    });
+        setTimeout(() => {
+            card.remove();
+            atualizarListaSugestoes();
 
-    const result = await response.text();
-
-    if (result === 'ok') {
-      form.closest('.suggestion-card').remove();
-    } else if (result === 'jaExiste') {
-      botao.textContent = 'Já enviada';
-    } else {
-      botao.textContent = 'Erro';
-      botao.disabled = false;
+            // Envia o form após a animação
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form)
+            });
+        }, 300);
     }
 
-  } catch (e) {
-    botao.textContent = 'Erro';
-    botao.disabled = false;
-    console.error(e);
-  }
-}
+    async function enviarSolicitacao(event, form) {
+        event.preventDefault();
 
+        const card = form.closest('.suggestion-card');
+        const botao = form.querySelector('.enviar');
+        const originalText = botao.textContent;
+
+        // Desabilitar imediatamente para prevenir múltiplos envios
+        botao.disabled = true;
+        botao.textContent = 'Enviando...';
+
+        // Adicionar classe de loading
+        card.classList.add('enviando');
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {
+                    'Cache-Control': 'no-cache'
+                }
+            });
+
+            const result = await response.text();
+            console.log('Resultado do envio:', result);
+
+            if (result === 'ok') {
+                // Remoção permanente com animação
+                card.style.opacity = '0';
+                card.style.transform = 'translateX(100px)';
+
+                setTimeout(() => {
+                    card.remove();
+                    atualizarListaSugestoes();
+                }, 300);
+
+            } else if (result === 'jaExiste') {
+                botao.textContent = 'Já enviada';
+                botao.style.backgroundColor = '#666';
+                // Manter desabilitado permanentemente
+                setTimeout(() => {
+                    card.style.opacity = '0.6';
+                }, 100);
+
+            } else {
+                botao.textContent = 'Erro';
+                botao.style.backgroundColor = '#ff4444';
+                setTimeout(() => {
+                    botao.textContent = originalText;
+                    botao.disabled = false;
+                    botao.style.backgroundColor = '';
+                    card.classList.remove('enviando');
+                }, 2000);
+            }
+
+        } catch (error) {
+            console.error('Erro ao enviar solicitação:', error);
+            botao.textContent = 'Erro de conexão';
+            botao.style.backgroundColor = '#ff4444';
+
+            setTimeout(() => {
+                botao.textContent = originalText;
+                botao.disabled = false;
+                botao.style.backgroundColor = '';
+                card.classList.remove('enviando');
+            }, 2000);
+        }
+    }
+
+    function scrollToBottom() {
+        const messages = document.getElementById('messages');
+        if (messages) {
+            messages.scrollTop = messages.scrollHeight;
+        }
+    }
+
+    // Scroll para baixo quando a página carregar
+    document.addEventListener('DOMContentLoaded', function() {
+        scrollToBottom();
+    });
+
+    function excluirMatch(form) {
+        if (confirm('Tem certeza que deseja excluir este match? Todas as mensagens serão perdidas e a pessoa não aparecerá nas sugestões por 30 dias.')) {
+            // Adicionar loading state
+            const button = form.querySelector('button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            button.disabled = true;
+
+            // Enviar o form
+            form.submit();
+            return true;
+        }
+        return false;
+    }
+
+    // Atualizar todos os forms de excluir match
+    document.addEventListener('DOMContentLoaded', function() {
+        const excluirMatchForms = document.querySelectorAll('form[action*="/excluirMatch"]');
+        excluirMatchForms.forEach(form => {
+            form.onsubmit = function() {
+                return excluirMatch(this);
+            };
+        });
+    });
+
+    // FUNÇÕES DO MODAL
+    function abrirModal(userId, userName, userImg, userCompat, userDesc) {
+        const modal = document.getElementById('userModal');
+        const modalImg = document.getElementById('modalUserImg');
+        const modalName = document.getElementById('modalUserName');
+        const modalCompat = document.getElementById('modalUserCompat');
+        const modalDesc = document.getElementById('modalUserDesc');
+        const modalUserId = document.getElementById('modalUserId');
+        const modalExcluirId = document.getElementById('modalExcluirId');
+
+        // Preencher dados do modal
+        modalImg.src = userImg;
+        modalImg.alt = `Foto de ${userName}`;
+
+        modalName.textContent = userName;
+        modalName.style.wordWrap = 'break-word';
+
+        // Garantir que a compatibilidade seja exibida corretamente
+        const compatClass = getCompatClass(userCompat);
+        modalCompat.innerHTML = `Compatibilidade: <span class="${compatClass}">${userCompat}</span>`;
+
+        // CORREÇÃO PRINCIPAL: Garantir que a descrição quebre linhas corretamente
+        if (userDesc && userDesc.trim() !== '') {
+            modalDesc.textContent = userDesc;
+            // Forçar quebra de linha para textos longos
+            modalDesc.style.whiteSpace = 'normal';
+            modalDesc.style.wordBreak = 'break-word';
+            modalDesc.style.overflowWrap = 'break-word';
+            modalDesc.style.color = '#e0e0e0';
+            modalDesc.style.fontStyle = 'normal';
+        } else {
+            modalDesc.textContent = 'Este usuário ainda não adicionou uma descrição.';
+            modalDesc.style.color = '#888';
+            modalDesc.style.fontStyle = 'italic';
+            modalDesc.style.textAlign = 'center';
+        }
+
+        modalDesc.style.wordWrap = 'break-word';
+        modalDesc.style.whiteSpace = 'normal';
+
+        modalUserId.value = userId;
+        modalExcluirId.value = userId;
+
+        // Mostrar modal com animação
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+
+        // Focar no botão de enviar para acessibilidade
+        setTimeout(() => {
+            const enviarBtn = document.querySelector('.modal-actions .enviar');
+            if (enviarBtn) enviarBtn.focus();
+        }, 300);
+    }
+
+    function fecharModal() {
+        const modal = document.getElementById('userModal');
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    function getCompatClass(compat) {
+        if (compat.includes('Alta')) return 'alta';
+        if (compat.includes('Média')) return 'media';
+        if (compat.includes('Baixa')) return 'baixa';
+        return 'media'; // padrão
+    }
+
+    // Fechar modal ao clicar fora do conteúdo
+    document.getElementById('userModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            fecharModal();
+        }
+    });
+
+    // Fechar modal com ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            fecharModal();
+        }
+    });
+
+    // Prevenir que o clique no card dispare quando clicar nos botões
+    document.querySelectorAll('.suggestion-buttons').forEach(buttons => {
+        buttons.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+
+    function handleSuggestionCardClick(event) {
+        const card = event.currentTarget;
+        const userId = card.getAttribute('data-user-id');
+        const userName = card.getAttribute('data-user-name');
+        const userImg = card.getAttribute('data-user-img');
+        const userCompat = card.getAttribute('data-user-compat');
+        const userDesc = card.getAttribute('data-user-desc');
+
+        abrirModal(userId, userName, userImg, userCompat, userDesc);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const suggestionCards = document.querySelectorAll('.suggestion-card');
+        suggestionCards.forEach(card => {
+            card.addEventListener('click', handleSuggestionCardClick);
+        });
+
+        // Fechar modal ao clicar fora do conteúdo
+        document.getElementById('userModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                fecharModal();
+            }
+        });
+
+        // Fechar modal com ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                fecharModal();
+            }
+        });
+
+        // Prevenir que o clique no card dispare quando clicar nos botões
+        document.querySelectorAll('.suggestion-buttons').forEach(buttons => {
+            buttons.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+    });
+
+    function atualizarListaSugestoes() {
+        const suggestionsList = document.querySelector('.suggestions-list');
+        const remainingCards = suggestionsList.querySelectorAll('.suggestion-card');
+
+        if (remainingCards.length === 0) {
+            suggestionsList.innerHTML = `
+                <div class="no-suggestions" style="text-align: center; color: #666; padding: 40px;">
+                    <i class="fa-solid fa-users" style="font-size: 48px; margin-bottom: 15px; color: #e60073;"></i>
+                    <h4>Nenhuma sugestão no momento</h4>
+                    <p>As sugestões aparecerão aqui quando houver usuários compatíveis disponíveis.</p>
+                </div>
+            `;
+        }
+    }
+
+    // Prevenir envio duplo no modal
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalForm = document.getElementById('modalEnviarForm');
+        if (modalForm) {
+            modalForm.onsubmit = function(e) {
+                enviarSolicitacao(e, this);
+                fecharModal(); // Fechar modal após envio
+            };
+        }
+    });
+
+    // Focar no input de mensagem quando um chat for aberto
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatInput = document.querySelector('.chat-input input');
+        if (chatInput) {
+            chatInput.focus();
+        }
+    });
+
+    function normalizarAlturaCards() {
+        const cards = document.querySelectorAll('.suggestion-card');
+        let alturaMaxima = 0;
+
+        // Primeiro, resetar todas as alturas
+        cards.forEach(card => {
+            card.style.height = 'auto';
+        });
+
+        // Encontrar a altura máxima
+        cards.forEach(card => {
+            if (card.offsetHeight > alturaMaxima) {
+                alturaMaxima = card.offsetHeight;
+            }
+        });
+
+        // Aplicar a altura máxima a todos os cards
+        cards.forEach(card => {
+            card.style.height = alturaMaxima + 'px';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        normalizarAlturaCards();
+
+        // Reaplicar quando as sugestões forem atualizadas
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList') {
+                    normalizarAlturaCards();
+                }
+            });
+        });
+
+        const suggestionsList = document.querySelector('.suggestions-list');
+        if (suggestionsList) {
+            observer.observe(suggestionsList, { childList: true });
+        }
+    });
+
+    window.addEventListener('resize', normalizarAlturaCards);
+
+    function normalizarAlturaChatCards() {
+        const chatCards = document.querySelectorAll('#chats-list .chat-card');
+        const solicitacaoCards = document.querySelectorAll('#solicitacoes-list .chat-card');
+
+        let alturaMaximaChat = 0;
+        let alturaMaximaSolicitacao = 0;
+
+        // Resetar alturas
+        chatCards.forEach(card => {
+            card.style.height = 'auto';
+        });
+        solicitacaoCards.forEach(card => {
+            card.style.height = 'auto';
+        });
+
+        // Encontrar altura máxima para chats
+        chatCards.forEach(card => {
+            if (card.offsetHeight > alturaMaximaChat) {
+                alturaMaximaChat = card.offsetHeight;
+            }
+        });
+
+        // Encontrar altura máxima para solicitações
+        solicitacaoCards.forEach(card => {
+            if (card.offsetHeight > alturaMaximaSolicitacao) {
+                alturaMaximaSolicitacao = card.offsetHeight;
+            }
+        });
+
+        // Aplicar alturas máximas
+        chatCards.forEach(card => {
+            card.style.height = alturaMaximaChat + 'px';
+        });
+        solicitacaoCards.forEach(card => {
+            card.style.height = alturaMaximaSolicitacao + 'px';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        normalizarAlturaChatCards();
+        normalizarAlturaCards(); // Função existente para cards de sugestão
+
+        // Observar mudanças nas listas de chat
+        const chatsList = document.getElementById('chats-list');
+        const solicitacoesList = document.getElementById('solicitacoes-list');
+
+        if (chatsList) {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList') {
+                        setTimeout(normalizarAlturaChatCards, 10);
+                    }
+                });
+            });
+
+            observer.observe(chatsList, { childList: true });
+        }
+
+        if (solicitacoesList) {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList') {
+                        setTimeout(normalizarAlturaChatCards, 10);
+                    }
+                });
+            });
+
+            observer.observe(solicitacoesList, { childList: true });
+        }
+    });
+
+    window.addEventListener('resize', function() {
+        normalizarAlturaChatCards();
+        normalizarAlturaCards();
+    });
+
+    function abrirChat(card) {
+        const chatId = card.getAttribute('data-chat-id');
+        if (chatId) {
+            // Redireciona para o chat
+            window.location.href = `/chat?chat=${chatId}`;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatCards = document.querySelectorAll('#chats-list .chat-card');
+        chatCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Previne que o clique nos botões dentro do card (se houver) dispare o evento
+                if (!e.target.closest('button')) {
+                    abrirChat(this);
+                }
+            });
+        });
+    });
 </script>
 
 </body>

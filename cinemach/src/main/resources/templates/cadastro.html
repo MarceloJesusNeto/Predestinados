@@ -15,7 +15,7 @@
     <div class="form-container">
         <h1>Crie sua conta</h1>
 
-        <form th:action="@{/registrar}" method="post" novalidate>
+        <form th:action="@{/registrar}" method="post" novalidate id="cadastroForm">
 
             <input
                     type="text"
@@ -45,6 +45,15 @@
             >
 
             <input type="hidden" id="generos" name="generos">
+
+            <!-- Checkbox de confirmação de idade (NOVO) -->
+            <div class="checkbox-container">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="confirmacaoIdade" name="confirmacaoIdade" required>
+                    <span class="checkmark"></span>
+                    Confirmo que tenho 18 anos ou mais
+                </label>
+            </div>
 
             <button type="submit">Cadastrar-se</button>
 
@@ -83,7 +92,11 @@
 
 const genres = document.querySelectorAll('.genre');
 const inputGeneros = document.getElementById('generos');
-const form = document.querySelector('form');
+const form = document.getElementById('cadastroForm');
+const nomeInput = document.getElementById('nome');
+const emailInput = document.getElementById('email');
+const senhaInput = document.getElementById('senha');
+const idadeCheckbox = document.getElementById('confirmacaoIdade');
 
 genres.forEach(genre => {
   genre.addEventListener('click', () => {
@@ -108,12 +121,77 @@ genres.forEach(genre => {
   });
 });
 
-// Validação antes de enviar o formulário
+// Validação completa antes de enviar o formulário
 form.addEventListener('submit', (e) => {
   const selecionados = document.querySelectorAll('.genre.selected');
+  const idadeConfirmada = idadeCheckbox.checked;
+
+  // Validar nome
+  if (!nomeInput.value.trim() || nomeInput.value.length < 3) {
+    e.preventDefault();
+    alert("Por favor, digite um nome válido com pelo menos 3 caracteres.");
+    nomeInput.focus();
+    return;
+  }
+
+  // Validar email
+  const emailRegex = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+  if (!emailInput.value || !emailRegex.test(emailInput.value)) {
+    e.preventDefault();
+    alert("Por favor, digite um email válido.");
+    emailInput.focus();
+    return;
+  }
+
+  // Validar senha
+  if (!senhaInput.value || senhaInput.value.length < 8) {
+    e.preventDefault();
+    alert("A senha deve ter pelo menos 8 caracteres.");
+    senhaInput.focus();
+    return;
+  }
+
+  // Validar gêneros
   if (selecionados.length !== 3) {
     e.preventDefault();
     alert("Escolha exatamente 3 gêneros favoritos antes de prosseguir!");
+    return;
+  }
+
+  // Validar idade
+  if (!idadeConfirmada) {
+    e.preventDefault();
+    alert("Você precisa confirmar que tem 18 anos ou mais para se cadastrar.");
+    idadeCheckbox.focus();
+    return;
+  }
+
+  // Se todas as validações passarem, o formulário será enviado
+});
+
+// Validação em tempo real para melhor UX
+nomeInput.addEventListener('blur', () => {
+  if (nomeInput.value.trim().length < 3) {
+    nomeInput.style.borderColor = '#ff4444';
+  } else {
+    nomeInput.style.borderColor = '#4dff88';
+  }
+});
+
+emailInput.addEventListener('blur', () => {
+  const emailRegex = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+  if (!emailRegex.test(emailInput.value)) {
+    emailInput.style.borderColor = '#ff4444';
+  } else {
+    emailInput.style.borderColor = '#4dff88';
+  }
+});
+
+senhaInput.addEventListener('blur', () => {
+  if (senhaInput.value.length < 8) {
+    senhaInput.style.borderColor = '#ff4444';
+  } else {
+    senhaInput.style.borderColor = '#4dff88';
   }
 });
 </script>

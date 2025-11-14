@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class ImdbService {
-    private static final String API_KEY = "40f9dfff";
+    private static final String API_KEY = "4bd65d1e";
     private static final String SEARCH_URL = "https://www.omdbapi.com/?apikey=" + API_KEY + "&s=";
     private static final String DETAIL_URL = "https://www.omdbapi.com/?apikey=" + API_KEY + "&i=";
 

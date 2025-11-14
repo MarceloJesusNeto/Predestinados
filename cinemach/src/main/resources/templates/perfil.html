@@ -346,6 +346,27 @@ button,
   display: inline-block;
 }
 
+
+    .btn-salvar-perfil {
+    margin-top: 20px;
+    background-color: #d46aff;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+    font-family: "Nunito", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: <weight>;
+    font-style: normal;
+}
+
+.btn-salvar-perfil:hover {
+    background-color: #ff85ff;
+    transform: scale(1.05);
+}
 </style>
 <header th:if="${session.usuarioLogado != null}">
     <div class="logo-header">
@@ -405,20 +426,29 @@ button,
         </div>
     </div>
 
-    <form th:action="@{/perfil/atualizar}" method="post" class="perfil-form">
+    <form th:action="@{/perfil/atualizar}" method="post" class="perfil-form" id="perfilForm">
         <label>Nome</label>
         <input type="text" name="nome" th:value="${usuario.nome}" required>
 
         <label>Email</label>
         <input type="email" name="email" th:value="${usuario.email}" required>
 
+        <!-- NOVO CAMPO: DESCRIÇÃO -->
+        <label>Sobre mim (máx. 300 caracteres)</label>
+        <textarea name="descricao" maxlength="300" placeholder="Conte um pouco sobre você, seus filmes favoritos, gêneros preferidos..."
+                  th:text="${usuario.descricao}"
+                  style="padding: 10px; border: none; border-radius: 8px; margin-top: 4px; background-color: #1f1f1f; color: white; font-family: 'Nunito', sans-serif; resize: vertical; min-height: 80px; width: 100%; box-sizing: border-box;"></textarea>
+        <div class="char-count" style="text-align: right; font-size: 12px; color: #ccc; margin-top: 5px;">
+            <span id="charCount">0</span>/300 caracteres
+        </div>
+
         <label>Senha atual</label>
         <input type="password" name="senhaAtual" placeholder="Digite sua senha atual" required>
 
         <label>Nova senha</label>
-        <input type="password" name="novaSenha" placeholder="Digite a nova senha">
+        <input type="password" name="novaSenha" placeholder="Digite a nova senha (opcional)">
 
-        <button type="submit" class="btn-salvar">Salvar alterações</button>
+        <button type="submit" class="btn-salvar-perfil">Salvar alterações</button>
     </form>
 
     <div th:if="${msg}" class="mensagem-sucesso">
@@ -467,25 +497,26 @@ button,
         const genero = botao.getAttribute("data-genero");
 
         try {
-          const resposta = await fetch("/perfil/salvarFilme", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({ imdbId, titulo, imagem, genero })
-          });
+            const resposta = await fetch("/perfil/salvarFilme", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams({ imdbId, titulo, imagem, genero })
+            });
 
-          const resultado = await resposta.text();
+            const resultado = await resposta.text();
 
-          if (resultado === "ADICIONADO") {
-            botao.innerHTML = '<i class="fa-solid fa-bookmark-circle-check"></i> Salvo';
-          } else if (resultado === "LIMITE") {
-            alert("Você já salvou o limite máximo de 10 filmes.");
-          } else if (resultado === "ERRO_LOGIN") {
-            alert("Você precisa estar logado para salvar filmes.");
-          }
+            if (resultado === "ADICIONADO") {
+                botao.innerHTML = '<i class="fa-solid fa-bookmark-circle-check"></i> Salvo';
+                botao.classList.add("salvo");
+            } else if (resultado === "LIMITE") {
+                alert("Você já salvou o limite máximo de 10 filmes.");
+            } else if (resultado === "ERRO_LOGIN") {
+                alert("Você precisa estar logado para salvar filmes.");
+            }
         } catch (erro) {
-          console.error("Erro ao salvar filme:", erro);
+            console.error("Erro ao salvar filme:", erro);
         }
-      }
+    }
 
       /**
        * ============================
@@ -493,98 +524,104 @@ button,
        * ============================
        */
 async function removerFilme(botao) {
-  const imdbId = botao.getAttribute("data-id");
+        const imdbId = botao.getAttribute("data-id");
 
-  try {
-    const resposta = await fetch(`/perfil/removerFilme/${imdbId}`, {
-      method: "DELETE"
-    });
+        try {
+            const resposta = await fetch(`/perfil/removerFilme/${imdbId}`, {
+                method: "DELETE"
+            });
 
-    const texto = await resposta.text();
+            const texto = await resposta.text();
 
-    if (resposta.ok && texto === "REMOVIDO") {
-      const card = botao.closest(".filme-card");
-      if (card) {
-        card.classList.add("fade-out");
-        setTimeout(() => card.remove(), 400);
-      }
-    } else if (texto === "ERRO_LOGIN") {
-      alert("Você precisa estar logado para remover filmes.");
-    } else {
-      alert("Erro ao remover filme.");
-      console.error("Resposta do servidor:", texto);
+            if (resposta.ok && texto === "REMOVIDO") {
+                const card = botao.closest(".filme-card");
+                if (card) {
+                    card.classList.add("fade-out");
+                    setTimeout(() => card.remove(), 400);
+                }
+            } else if (texto === "ERRO_LOGIN") {
+                alert("Você precisa estar logado para remover filmes.");
+            } else {
+                alert("Erro ao remover filme.");
+                console.error("Resposta do servidor:", texto);
+            }
+        } catch (erro) {
+            console.error("Erro ao remover filme:", erro);
+        }
     }
-  } catch (erro) {
-    console.error("Erro ao remover filme:", erro);
-  }
-}
       /**
        * ============================
        * EVENTOS DOS BOTÕES
        * ============================
        */
-      document.querySelectorAll(".btn-salvar").forEach(botao => {
-    // impede que o botão de salvar foto dispare o mesmo evento
-    if (!botao.classList.contains("btn-salvar-foto")) {
-        botao.addEventListener("click", () => salvarFilme(botao));
-    }
-});
-
-      document.querySelectorAll(".btn-remover").forEach(botao => {
-        botao.addEventListener("click", () => removerFilme(botao));
-      });
-
+       document.querySelectorAll(".btn-salvar[data-id]").forEach(botao => {
+        botao.addEventListener("click", (e) => {
+            e.preventDefault();
+            salvarFilme(botao);
+        });
     });
+
+    // Botões de remover
+    document.querySelectorAll(".btn-remover").forEach(botao => {
+        botao.addEventListener("click", (e) => {
+            e.preventDefault();
+            removerFilme(botao);
+        });
+    });
+
+});
 
     // ============================
   // SALVAR PERFIL VIA AJAX
   // ============================
   const formPerfil = document.querySelector(".perfil-form");
 
-  formPerfil.addEventListener("submit", async (e) => {
-    e.preventDefault(); // evita reload da página
+if (formPerfil) {
+    formPerfil.addEventListener("submit", async (e) => {
+        e.preventDefault(); // evita reload da página
 
-    const formData = new FormData(formPerfil);
+        const formData = new FormData(formPerfil);
 
-    try {
-      const resposta = await fetch("/perfil/atualizar", {
-        method: "POST",
-        body: formData
-      });
+        try {
+            const resposta = await fetch("/perfil/atualizar", {
+                method: "POST",
+                body: formData
+            });
 
-      const texto = await resposta.text();
+            const texto = await resposta.text();
 
-      // Limpa mensagens anteriores
-      document.querySelector(".mensagem-sucesso")?.remove();
-      document.querySelector(".mensagem-erro")?.remove();
+            // Limpa mensagens anteriores
+            document.querySelector(".mensagem-sucesso")?.remove();
+            document.querySelector(".mensagem-erro")?.remove();
 
-      const msgContainer = document.createElement("div");
-      msgContainer.classList.add("mensagem-retorno");
+            const msgContainer = document.createElement("div");
+            msgContainer.classList.add("mensagem-retorno");
 
-      if (resposta.ok && texto.includes("Perfil atualizado")) {
-        msgContainer.classList.add("mensagem-sucesso");
-        msgContainer.innerHTML = `<i class="fa-solid fa-circle-check"></i> Perfil atualizado com sucesso!`;
-      } else if (texto.includes("Senha atual incorreta")) {
-        msgContainer.classList.add("mensagem-erro");
-        msgContainer.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Senha atual incorreta.`;
-      } else if (texto.includes("Informe sua senha atual")) {
-        msgContainer.classList.add("mensagem-erro");
-        msgContainer.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Informe sua senha atual.`;
-      } else {
-        msgContainer.classList.add("mensagem-erro");
-        msgContainer.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Ocorreu um erro ao atualizar o perfil.`;
-      }
+            if (resposta.ok && texto.includes("Perfil atualizado com sucesso")) {
+                msgContainer.classList.add("mensagem-sucesso");
+                msgContainer.innerHTML = `<i class="fa-solid fa-circle-check"></i> Perfil atualizado com sucesso!`;
+            } else if (texto.includes("Senha atual incorreta")) {
+                msgContainer.classList.add("mensagem-erro");
+                msgContainer.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Senha atual incorreta.`;
+            } else if (texto.includes("Informe sua senha atual")) {
+                msgContainer.classList.add("mensagem-erro");
+                msgContainer.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Informe sua senha atual.`;
+            } else {
+                msgContainer.classList.add("mensagem-erro");
+                msgContainer.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Ocorreu um erro ao atualizar o perfil.`;
+            }
 
-      formPerfil.insertAdjacentElement("afterend", msgContainer);
+            formPerfil.insertAdjacentElement("afterend", msgContainer);
 
-      // Remove mensagem após 5 segundos
-      setTimeout(() => msgContainer.remove(), 5000);
+            // Remove mensagem após 5 segundos
+            setTimeout(() => msgContainer.remove(), 5000);
 
-    } catch (erro) {
-      console.error("Erro ao atualizar perfil:", erro);
-      alert("Erro inesperado. Tente novamente.");
-    }
-  });
+        } catch (erro) {
+            console.error("Erro ao atualizar perfil:", erro);
+            alert("Erro inesperado. Tente novamente.");
+        }
+    });
+}
 
     let idFotoSelecionada = null;
 
@@ -630,6 +667,160 @@ document.getElementById("cancelarFoto").onclick = () => {
   document.getElementById("modal-foto").style.display = "none";
 };
     document.getElementById("trocarFotoBtn").addEventListener("click", abrirModalFoto);
+
+    // ============================
+// CONTADOR DE CARACTERES PARA DESCRIÇÃO
+// ============================
+document.addEventListener('DOMContentLoaded', function() {
+    const descricaoTextarea = document.querySelector('textarea[name="descricao"]');
+    const charCount = document.getElementById('charCount');
+
+    if (descricaoTextarea && charCount) {
+        // Atualizar contador inicial
+        const initialLength = descricaoTextarea.value ? descricaoTextarea.value.length : 0;
+        charCount.textContent = initialLength;
+        updateCharCountStyle(initialLength);
+
+        // Atualizar enquanto digita
+        descricaoTextarea.addEventListener('input', function() {
+            const length = this.value.length;
+            charCount.textContent = length;
+            updateCharCountStyle(length);
+        });
+
+        function updateCharCountStyle(length) {
+            if (length > 300) {
+                charCount.style.color = '#ff4444';
+                charCount.style.fontWeight = 'bold';
+            } else if (length > 250) {
+                charCount.style.color = 'orange';
+                charCount.style.fontWeight = 'normal';
+            } else {
+                charCount.style.color = '#ccc';
+                charCount.style.fontWeight = 'normal';
+            }
+        }
+    }
+});
+
+// ============================
+// ATUALIZAÇÃO EM TEMPO REAL DA DESCRIÇÃO
+// ============================
+let descricaoTimeout;
+const descricaoTextarea = document.querySelector('textarea[name="descricao"]');
+
+if (descricaoTextarea) {
+    descricaoTextarea.addEventListener('input', function() {
+        clearTimeout(descricaoTimeout);
+
+        // Salvar automaticamente após 2 segundos sem digitar
+        descricaoTimeout = setTimeout(async () => {
+            const descricao = this.value;
+
+            // Validação de comprimento
+            if (descricao.length > 300) {
+                showTempMessage('Descrição muito longa (máx. 300 caracteres)', 'error');
+                return;
+            }
+
+            try {
+                const resposta = await fetch('/perfil/atualizarDescricao', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `descricao=${encodeURIComponent(descricao)}`
+                });
+
+                const resultado = await resposta.text();
+
+                if (resultado === 'ATUALIZADO') {
+                    showTempMessage('Descrição salva automaticamente!', 'success');
+                } else if (resultado === 'LIMITE_EXCEDIDO') {
+                    showTempMessage('Descrição muito longa (máx. 300 caracteres)', 'error');
+                } else if (resultado === 'ERRO_LOGIN') {
+                    showTempMessage('Erro de sessão. Faça login novamente.', 'error');
+                }
+            } catch (erro) {
+                console.error('Erro ao salvar descrição:', erro);
+                showTempMessage('Erro ao salvar descrição', 'error');
+            }
+        }, 2000);
+    });
+}
+
+// ============================
+// SUBMISSÃO DO FORMULÁRIO PRINCIPAL
+// ============================
+const perfilForm = document.getElementById('perfilForm');
+
+if (perfilForm) {
+    perfilForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        try {
+            const resposta = await fetch('/perfil/atualizar', {
+                method: 'POST',
+                body: formData
+            });
+
+            const texto = await resposta.text();
+
+            // Limpa mensagens anteriores
+            document.querySelector('.mensagem-sucesso')?.remove();
+            document.querySelector('.mensagem-erro')?.remove();
+            document.querySelector('.temp-message')?.remove();
+
+            const msgContainer = document.createElement('div');
+            msgContainer.classList.add('mensagem-retorno');
+
+            if (texto.includes('Perfil atualizado com sucesso')) {
+                msgContainer.classList.add('mensagem-sucesso');
+                msgContainer.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${texto}`;
+            } else if (texto.includes('Senha atual incorreta') || texto.includes('Informe sua senha atual') || texto.includes('Descrição muito longa')) {
+                msgContainer.classList.add('mensagem-erro');
+                msgContainer.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${texto}`;
+            } else {
+                msgContainer.classList.add('mensagem-erro');
+                msgContainer.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Ocorreu um erro ao atualizar o perfil.`;
+            }
+
+            perfilForm.insertAdjacentElement('afterend', msgContainer);
+
+            // Remove mensagem após 5 segundos
+            setTimeout(() => msgContainer.remove(), 5000);
+
+        } catch (erro) {
+            console.error('Erro ao atualizar perfil:', erro);
+            showTempMessage('Erro inesperado. Tente novamente.', 'error');
+        }
+    });
+}
+
+// Função para mostrar mensagem temporária
+function showTempMessage(message, type) {
+    // Remove mensagens temporárias anteriores
+    document.querySelectorAll('.temp-message').forEach(msg => msg.remove());
+
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `temp-message ${type === 'success' ? 'mensagem-sucesso' : 'mensagem-erro'}`;
+    msgDiv.style.marginTop = '10px';
+    msgDiv.style.padding = '8px 12px';
+    msgDiv.style.borderRadius = '6px';
+    msgDiv.style.fontSize = '14px';
+    msgDiv.style.animation = 'fadeInOut 3s ease-in-out';
+    msgDiv.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-triangle-exclamation'}"></i> ${message}`;
+
+    const charCount = document.querySelector('.char-count');
+    if (charCount) {
+        charCount.parentNode.appendChild(msgDiv);
+    } else {
+        document.querySelector('textarea[name="descricao"]').parentNode.appendChild(msgDiv);
+    }
+
+    // Remove após 3 segundos
+    setTimeout(() => msgDiv.remove(), 3000);
+}
 </script>
 </body>
 </html>

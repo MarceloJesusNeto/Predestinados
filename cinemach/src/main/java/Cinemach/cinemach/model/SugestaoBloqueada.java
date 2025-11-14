@@ -30,4 +30,20 @@ public class SugestaoBloqueada {
     public Usuario getUsuario() { return usuario; }
     public Usuario getBloqueado() { return bloqueado; }
     public LocalDateTime getExpiracao() { return expiracao; }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public void setBloqueado(Usuario bloqueado) {
+        this.bloqueado = bloqueado;
+    }
+
+    public void setExpiracao(LocalDateTime expiracao) {
+        this.expiracao = expiracao;
+    }
 }

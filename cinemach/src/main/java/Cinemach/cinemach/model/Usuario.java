@@ -23,6 +23,10 @@ public class Usuario {
     @Column(length = 255)
     private String generos;
 
+
+    @Column(length = 300)
+    private String descricao;
+
     public Long getId() {
         return id;
     }
@@ -67,5 +71,14 @@ public class Usuario {
 
     public void setFotoPerfil(FotoPerfil fotoPerfil) {
         this.fotoPerfil = fotoPerfil;
+    }
+
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 }

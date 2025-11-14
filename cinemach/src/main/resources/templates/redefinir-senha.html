@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch - Redefinir Senha</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<style>
+    .logo-link {
+        position: absolute;
+        top: 20px;
+        left: 30px;
+        z-index: 10;
+    }
+
+    .logo-btn {
+        width: 80px;
+        height: auto;
+        cursor: pointer;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        transition: transform 0.4s ease, filter 0.4s ease;
+    }
+
+    .logo-btn:hover {
+        transform: scale(1.08);
+        filter: drop-shadow(0 0 10px #ff4df5) brightness(1.3);
+    }
+
+    .reset-password-container {
+        max-width: 400px;
+        width: 90%;
+    }
+
+    .instructions {
+        text-align: center;
+        color: #ccc;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .back-to-login {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+
+    .back-to-login a {
+        color: #7B3FFF;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .back-to-login a:hover {
+        color: #ff5fa0;
+        text-decoration: underline;
+    }
+</style>
+<body>
+
+<a href="/login" class="logo-link">
+    <img src="/img/icons8-seta-esquerda-64.png" alt="Voltar" class="logo-btn">
+</a>
+
+<div style="background:url('https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;" class="left-side">
+    <div class="overlay"></div>
+    <div class="left-content">
+        <h1 class="logo">CineMatch</h1>
+        <p class="subtitle">Crie uma nova senha</p>
+    </div>
+</div>
+
+<div class="right-side">
+    <div class="login-box reset-password-container">
+        <h2>Nova Senha</h2>
+
+        <div class="instructions">
+            Digite sua nova senha abaixo.
+        </div>
+
+        <form th:action="@{/redefinir-senha}" method="post">
+            <input type="hidden" name="token" th:value="${token}">
+
+            <div class="input-group">
+                <input
+                        type="password"
+                        id="novaSenha"
+                        name="novaSenha"
+                        placeholder="Nova senha"
+                        required
+                        minlength="6"
+                >
+            </div>
+
+            <div class="input-group">
+                <input
+                        type="password"
+                        id="confirmarSenha"
+                        name="confirmarSenha"
+                        placeholder="Confirmar nova senha"
+                        required
+                        minlength="6"
+                >
+            </div>
+
+            <button type="submit">Redefinir Senha</button>
+
+            <p th:if="${sucesso}" style="color: #4dff88; margin-top: 15px; text-align: center;" th:text="${sucesso}"></p>
+            <p th:if="${erro}" style="color: red; margin-top: 15px; text-align: center;" th:text="${erro}"></p>
+        </form>
+
+        <div class="back-to-login">
+            <a href="/login">← Voltar para o login</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const senha = document.getElementById('novaSenha').value;
+        const confirmarSenha = document.getElementById('confirmarSenha').value;
+
+        if (senha !== confirmarSenha) {
+            e.preventDefault();
+            alert('As senhas não coincidem!');
+            return false;
+        }
+
+        if (senha.length < 6) {
+            e.preventDefault();
+            alert('A senha deve ter pelo menos 6 caracteres!');
+            return false;
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -112,7 +112,8 @@
     </section>
 
     <div th:if="${session != null and session.usuarioLogado != null}" class="carregar-mais-container" style="text-align:center; margin:40px 0;">
-        <button id="btnCarregarMais" class="btn-carregar-mais">Carregar mais</button>
+        <button id="btnCarregarMais" class="btn-carregar-mais" th:if="${temMais}">Carregar mais</button>
+        <p id="semMaisFilmes" style="display:none; color:#666;">Não há mais filmes para carregar</p>
     </div>
 
     <section  th:if="${session == null or session.usuarioLogado == null}" class="catalogo">
@@ -188,258 +189,484 @@
 <script src="/js/filmes.js"></script>
 
 <script>
-    let offset = 27;
+    // Variáveis globais
+    let carregando = false;
+    let favoritosIds = [];
+    let salvosIds = [];
 
-document.getElementById("btnCarregarMais").addEventListener("click", async () => {
-    const btn = document.getElementById("btnCarregarMais");
-    btn.disabled = true;
-    btn.textContent = "Carregando...";
+    document.addEventListener("DOMContentLoaded", function() {
+        const btnCarregarMais = document.getElementById("btnCarregarMais");
 
-    try {
-        const response = await fetch(`/filmes/mais?offset=${offset}`);
-        const novosFilmes = await response.json();
-
-        if (novosFilmes.length === 0) {
-            btn.textContent = "Não há mais filmes";
-            btn.disabled = true;
-            return;
+        if (btnCarregarMais) {
+            btnCarregarMais.addEventListener("click", carregarMaisFilmes);
         }
 
-        const catalogo = document.querySelector(".catalogo");
+        inicializarModal();
+        inicializarFavoritosESalvos();
+        inicializarEventListenersCards();
+    });
 
-        novosFilmes.forEach(filme => {
-            const card = document.createElement("div");
-            card.classList.add("card");
-            card.innerHTML = `
-                <img src="${filme.imagem}" alt="Poster do filme" loading="lazy">
-                <h3>${filme.titulo}</h3>
-                <p>${filme.genero}</p>
-                <div class="botoes">
-                    <button class="btn-favoritar" data-id="${filme.imdbId}" data-titulo="${filme.titulo}" data-imagem="${filme.imagem}" data-genero="${filme.genero}" onclick="favoritarFilme(this)">
-                        <i class="fa-solid fa-heart"></i> Favoritar
-                    </button>
-                    <button class="btn-salvar" data-id="${filme.imdbId}" data-titulo="${filme.titulo}" data-imagem="${filme.imagem}" data-genero="${filme.genero}" onclick="salvarFilme(this)">
-                        <i class="fa-solid fa-bookmark"></i> Salvar
-                    </button>
-                </div>
-            `;
-            catalogo.appendChild(card);
+    // ==========================
+    // FUNÇÃO PARA CARREGAR MAIS FILMES
+    // ==========================
+    async function carregarMaisFilmes() {
+        if (carregando) return;
+
+        const btn = document.getElementById("btnCarregarMais");
+        const semMaisFilmes = document.getElementById("semMaisFilmes");
+
+        carregando = true;
+        btn.disabled = true;
+        btn.textContent = "Carregando...";
+
+        try {
+            const response = await fetch('/filmes/mais');
+            const novosFilmes = await response.json();
+
+            if (novosFilmes.length === 0) {
+                btn.style.display = "none";
+                if (semMaisFilmes) {
+                    semMaisFilmes.style.display = "block";
+                }
+                return;
+            }
+
+            const catalogo = document.querySelector(".catalogo");
+
+            novosFilmes.forEach(filme => {
+                const card = criarCardFilme(filme);
+                catalogo.appendChild(card);
+            });
+
+            // Re-inicializar os event listeners para os novos cards
+            inicializarEventListenersCards();
+
+            btn.textContent = "Carregar mais";
+            btn.disabled = false;
+
+        } catch (error) {
+            console.error("Erro ao carregar mais filmes:", error);
+            btn.textContent = "Erro ao carregar";
+            setTimeout(() => {
+                btn.textContent = "Carregar mais";
+                btn.disabled = false;
+            }, 2000);
+        } finally {
+            carregando = false;
+        }
+    }
+
+    // ==========================
+    // FUNÇÃO PARA CRIAR CARD DE FILME
+    // ==========================
+    function criarCardFilme(filme) {
+        const card = document.createElement("div");
+        card.classList.add("card");
+
+        const isFavoritado = favoritosIds.includes(filme.imdbId);
+        const isSalvo = salvosIds.includes(filme.imdbId);
+
+        card.innerHTML = `
+            <img src="${filme.imagem}" alt="Poster do filme ${filme.titulo}" loading="lazy">
+            <h3>${filme.titulo}</h3>
+            <p>${filme.genero}</p>
+            <div class="botoes">
+                <button class="btn-favoritar ${isFavoritado ? 'favoritado' : ''}"
+                        data-id="${filme.imdbId}"
+                        data-titulo="${filme.titulo}"
+                        data-imagem="${filme.imagem}"
+                        data-genero="${filme.genero}">
+                    <i class="fa-solid ${isFavoritado ? 'fa-heart-circle-check' : 'fa-heart'}"></i>
+                    ${isFavoritado ? 'Favoritado' : 'Favoritar'}
+                </button>
+                <button class="btn-salvar ${isSalvo ? 'salvo' : ''}"
+                        data-id="${filme.imdbId}"
+                        data-titulo="${filme.titulo}"
+                        data-imagem="${filme.imagem}"
+                        data-genero="${filme.genero}">
+                    <i class="fa-solid ${isSalvo ? 'fa-bookmark-circle-check' : 'fa-bookmark'}"></i>
+                    ${isSalvo ? 'Salvo' : 'Salvar'}
+                </button>
+            </div>
+        `;
+
+        return card;
+    }
+
+    // ==========================
+    // INICIALIZAR EVENT LISTENERS DOS CARDS
+    // ==========================
+    function inicializarEventListenersCards() {
+        document.querySelectorAll(".card").forEach(card => {
+            // Remover event listeners existentes para evitar duplicação
+            const novoCard = card.cloneNode(true);
+            card.parentNode.replaceChild(novoCard, card);
+
+            const btnFavoritar = novoCard.querySelector(".btn-favoritar");
+            const btnSalvar = novoCard.querySelector(".btn-salvar");
+
+            if (btnFavoritar) {
+                btnFavoritar.addEventListener("click", function(e) {
+                    e.stopPropagation();
+                    favoritarFilme(this);
+                });
+            }
+
+            if (btnSalvar) {
+                btnSalvar.addEventListener("click", function(e) {
+                    e.stopPropagation();
+                    salvarFilme(this);
+                });
+            }
+
+            // Event listener para abrir modal
+            novoCard.addEventListener("click", function(e) {
+                if (!e.target.closest(".btn-favoritar") && !e.target.closest(".btn-salvar")) {
+                    abrirModalFilme(this);
+                }
+            });
+        });
+    }
+
+    // ==========================
+    // FUNÇÕES DE FAVORITAR/SALVAR
+    // ==========================
+    window.favoritarFilme = async function(botao) {
+        const imdbId = botao.dataset.id;
+        const titulo = botao.dataset.titulo;
+        const imagem = botao.dataset.imagem;
+        const genero = botao.dataset.genero;
+
+        try {
+            const resposta = await fetch("/favoritar", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams({ imdbId, titulo, imagem, genero })
+            });
+            const resultado = await resposta.text();
+
+            if (resultado === "ADICIONADO") {
+                favoritosIds.push(imdbId);
+                atualizarEstadoBotaoFavorito(imdbId, true);
+            } else if (resultado === "REMOVIDO") {
+                favoritosIds = favoritosIds.filter(id => id !== imdbId);
+                atualizarEstadoBotaoFavorito(imdbId, false);
+            }
+        } catch (erro) {
+            console.error("Erro ao favoritar:", erro);
+        }
+    };
+
+    window.salvarFilme = async function(botao) {
+        const imdbId = botao.dataset.id;
+        const titulo = botao.dataset.titulo;
+        const imagem = botao.dataset.imagem;
+        const genero = botao.dataset.genero;
+
+        try {
+            const resposta = await fetch("/perfil/salvar", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams({ imdbId, titulo, imagem, genero })
+            });
+            const resultado = await resposta.text();
+
+            if (resultado === "ADICIONADO") {
+                salvosIds.push(imdbId);
+                atualizarEstadoBotaoSalvar(imdbId, true);
+            } else if (resultado === "REMOVIDO") {
+                salvosIds = salvosIds.filter(id => id !== imdbId);
+                atualizarEstadoBotaoSalvar(imdbId, false);
+            }
+        } catch (erro) {
+            console.error("Erro ao salvar:", erro);
+        }
+    };
+
+    // ==========================
+    // ATUALIZAR ESTADO DOS BOTÕES
+    // ==========================
+    function atualizarEstadoBotaoFavorito(imdbId, ativo) {
+        document.querySelectorAll(`.btn-favoritar[data-id="${imdbId}"]`).forEach(btn => {
+            if (ativo) {
+                btn.classList.add("favoritado");
+                btn.innerHTML = '<i class="fa-solid fa-heart-circle-check"></i> Favoritado';
+            } else {
+                btn.classList.remove("favoritado");
+                btn.innerHTML = '<i class="fa-solid fa-heart"></i> Favoritar';
+            }
+        });
+    }
+
+    function atualizarEstadoBotaoSalvar(imdbId, ativo) {
+        document.querySelectorAll(`.btn-salvar[data-id="${imdbId}"]`).forEach(btn => {
+            if (ativo) {
+                btn.classList.add("salvo");
+                btn.innerHTML = '<i class="fa-solid fa-bookmark-circle-check"></i> Salvo';
+            } else {
+                btn.classList.remove("salvo");
+                btn.innerHTML = '<i class="fa-solid fa-bookmark"></i> Salvar';
+            }
+        });
+    }
+
+    // ==========================
+    // FUNÇÃO PARA ABRIR MODAL
+    // ==========================
+    async function abrirModalFilme(card) {
+        const imdbId = card.querySelector(".btn-favoritar")?.dataset.id;
+        if (!imdbId) return;
+
+        try {
+            const resposta = await fetch(`/detalhes/${imdbId}`);
+            const filme = await resposta.json();
+
+            const modal = document.getElementById("modalFilme");
+            const poster = document.getElementById("posterFilme");
+            const titulo = document.getElementById("tituloFilme");
+            const descricao = document.getElementById("descricaoFilme");
+            const nota = document.getElementById("notaFilme");
+            const btnFavoritarModal = document.getElementById("btnFavoritarModal");
+            const btnSalvarModal = document.getElementById("btnSalvarModal");
+
+            poster.src = filme.imagem || card.querySelector("img").src;
+            titulo.textContent = filme.titulo || "Título não disponível";
+            descricao.textContent = filme.descricao || "Descrição não disponível.";
+            nota.textContent = filme.nota || "—";
+
+            // Atualizar dados dos botões do modal
+            [btnFavoritarModal, btnSalvarModal].forEach(btn => {
+                btn.dataset.id = imdbId;
+                btn.dataset.titulo = filme.titulo;
+                btn.dataset.imagem = filme.imagem;
+                btn.dataset.genero = filme.genero;
+            });
+
+            // Atualizar estado dos botões no modal
+            atualizarEstadoBotaoFavorito(imdbId, favoritosIds.includes(imdbId));
+            atualizarEstadoBotaoSalvar(imdbId, salvosIds.includes(imdbId));
+
+            // Atualizar listeners dos botões do modal
+            atualizarListenersModal();
+
+            modal.style.display = "flex";
+            document.body.classList.add("modal-ativo");
+
+        } catch (e) {
+            console.error("Erro ao buscar detalhes:", e);
+        }
+    }
+
+    // ==========================
+    // INICIALIZAR MODAL
+    // ==========================
+    function inicializarModal() {
+        const modal = document.getElementById("modalFilme");
+        const fechar = modal.querySelector(".fechar");
+
+        // Fechar modal com X
+        fechar.onclick = () => {
+            modal.style.display = "none";
+            document.body.classList.remove("modal-ativo");
+        };
+
+        // Fechar modal clicando fora
+        modal.addEventListener("click", e => {
+            if (e.target === modal) {
+                modal.style.display = "none";
+                document.body.classList.remove("modal-ativo");
+            }
         });
 
-        offset += novosFilmes.length;
-        btn.textContent = "Carregar mais";
-        btn.disabled = false;
-
-    } catch (error) {
-        console.error("Erro ao carregar mais filmes:", error);
-        btn.textContent = "Erro ao carregar";
+        // Fechar modal com ESC
+        document.addEventListener("keydown", e => {
+            if (e.key === "Escape" && modal.style.display === "flex") {
+                modal.style.display = "none";
+                document.body.classList.remove("modal-ativo");
+            }
+        });
     }
-});
-document.addEventListener("DOMContentLoaded", async function () {
 
-  const modal = document.getElementById("modalFilme");
-  const poster = document.getElementById("posterFilme");
-  const titulo = document.getElementById("tituloFilme");
-  const descricao = document.getElementById("descricaoFilme");
-  const nota = document.getElementById("notaFilme");
-  const fechar = modal.querySelector(".fechar");
-  const btnFavoritarModal = document.getElementById("btnFavoritarModal");
-  const btnSalvarModal = document.getElementById("btnSalvarModal");
+    // ==========================
+    // ATUALIZAR LISTENERS DO MODAL
+    // ==========================
+    function atualizarListenersModal() {
+        const btnFavoritarModal = document.getElementById("btnFavoritarModal");
+        const btnSalvarModal = document.getElementById("btnSalvarModal");
 
-  let favoritosIds = [];
-  let salvosIds = [];
+        // Remover listeners antigos
+        const novoBtnFavoritar = btnFavoritarModal.cloneNode(true);
+        const novoBtnSalvar = btnSalvarModal.cloneNode(true);
 
-  // ==========================
-  // FUNÇÕES DE FAVORITAR/SALVAR
-  // ==========================
-  window.favoritarFilme = async function (botao) {
-    const imdbId = botao.dataset.id;
-    const titulo = botao.dataset.titulo;
-    const imagem = botao.dataset.imagem;
-    const genero = botao.dataset.genero;
+        btnFavoritarModal.replaceWith(novoBtnFavoritar);
+        btnSalvarModal.replaceWith(novoBtnSalvar);
 
-    try {
-      const resposta = await fetch("/favoritar", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ imdbId, titulo, imagem, genero })
-      });
-      const resultado = await resposta.text();
-
-      if (resultado === "ADICIONADO") {
-        favoritosIds.push(imdbId);
-        atualizarEstadoBotaoFavorito(imdbId, true);
-      } else if (resultado === "REMOVIDO") {
-        favoritosIds = favoritosIds.filter(id => id !== imdbId);
-        atualizarEstadoBotaoFavorito(imdbId, false);
-      }
-    } catch (erro) {
-      console.error("Erro ao favoritar:", erro);
-    }
-  };
-
-
-
-  // ==========================
-  // VISUAL DOS BOTÕES
-  // ==========================
-  function atualizarEstadoBotaoFavorito(imdbId, ativo) {
-    document.querySelectorAll(`.btn-favoritar[data-id="${imdbId}"]`).forEach(btn => {
-      if (ativo) {
-        btn.classList.add("favoritado");
-        btn.innerHTML = '<i class="fa-solid fa-heart-circle-check"></i> Favoritado';
-      } else {
-        btn.classList.remove("favoritado");
-        btn.innerHTML = '<i class="fa-solid fa-heart"></i> Favoritar';
-      }
-    });
-  }
-
-  function atualizarEstadoBotaoSalvar(imdbId, ativo) {
-    document.querySelectorAll(`.btn-salvar[data-id="${imdbId}"]`).forEach(btn => {
-      if (ativo) {
-        btn.classList.add("salvo");
-        btn.innerHTML = '<i class="fa-solid fa-bookmark-circle-check"></i> Salvo';
-      } else {
-        btn.classList.remove("salvo");
-        btn.innerHTML = '<i class="fa-solid fa-bookmark"></i> Salvar';
-      }
-    });
-  }
-
-  // ==========================
-  // CARREGAR ESTADO
-  // ==========================
-  try {
-    const [respFav, respSalvo] = await Promise.all([
-      fetch("/favoritos/ids"),
-      fetch("/perfil/salvos/ids")
-    ]);
-
-    if (respFav.ok) favoritosIds = await respFav.json();
-    if (respSalvo.ok) salvosIds = await respSalvo.json();
-
-    favoritosIds.forEach(id => atualizarEstadoBotaoFavorito(id, true));
-    salvosIds.forEach(id => atualizarEstadoBotaoSalvar(id, true));
-  } catch (e) {
-    console.warn("Erro ao carregar estados:", e);
-  }
-
-  // ==========================
-  // ABRIR MODAL (UMA ÚNICA VEZ)
-  // ==========================
-  document.querySelectorAll(".card").forEach(card => {
-    card.addEventListener("click", async (e) => {
-      if (e.target.closest(".btn-favoritar") || e.target.closest(".btn-salvar")) return;
-
-      const imdbId = card.querySelector(".btn-favoritar")?.dataset.id;
-      if (!imdbId) return;
-
-      try {
-        const resposta = await fetch(`/detalhes/${imdbId}`);
-        const filme = await resposta.json();
-
-        poster.src = filme.imagem || card.querySelector("img").src;
-        titulo.textContent = filme.titulo || "Título não disponível";
-        descricao.textContent = filme.descricao || "Descrição não disponível.";
-        nota.textContent = filme.nota || "—";
-
-        [btnFavoritarModal, btnSalvarModal].forEach(btn => {
-          btn.dataset.id = imdbId;
-          btn.dataset.titulo = filme.titulo;
-          btn.dataset.imagem = filme.imagem;
-          btn.dataset.genero = filme.genero;
+        // Adicionar novos listeners
+        novoBtnFavoritar.addEventListener("click", (e) => {
+            e.stopPropagation();
+            favoritarFilme(novoBtnFavoritar);
         });
 
-        atualizarEstadoBotaoFavorito(imdbId, favoritosIds.includes(imdbId));
-        atualizarEstadoBotaoSalvar(imdbId, salvosIds.includes(imdbId));
+        novoBtnSalvar.addEventListener("click", (e) => {
+            e.stopPropagation();
+            salvarFilme(novoBtnSalvar);
+        });
+    }
 
-        modal.style.display = "flex";
-        document.body.classList.add("modal-ativo");
-      } catch (e) {
-        console.error("Erro ao buscar detalhes:", e);
-      }
+    // ==========================
+    // INICIALIZAR FAVORITOS E SALVOS
+    // ==========================
+    async function inicializarFavoritosESalvos() {
+        try {
+            const [respFav, respSalvo] = await Promise.all([
+                fetch("/favoritos/ids"),
+                fetch("/perfil/salvos/ids")
+            ]);
+
+            if (respFav.ok) favoritosIds = await respFav.json();
+            if (respSalvo.ok) salvosIds = await respSalvo.json();
+
+            // Atualizar estado inicial dos botões
+            favoritosIds.forEach(id => atualizarEstadoBotaoFavorito(id, true));
+            salvosIds.forEach(id => atualizarEstadoBotaoSalvar(id, true));
+
+        } catch (e) {
+            console.warn("Erro ao carregar estados iniciais:", e);
+        }
+    }
+
+    // ==========================
+    // FUNÇÕES AUXILIARES
+    // ==========================
+
+    // Função para mostrar loading
+    function mostrarLoading() {
+        const loading = document.getElementById("loading");
+        if (loading) loading.style.display = "flex";
+    }
+
+    // Função para esconder loading
+    function esconderLoading() {
+        const loading = document.getElementById("loading");
+        if (loading) loading.style.display = "none";
+    }
+
+    // Função para mostrar mensagem temporária
+    function mostrarMensagem(mensagem, tipo = "info") {
+        const mensagemDiv = document.createElement("div");
+        mensagemDiv.className = `mensagem-flutuante ${tipo}`;
+        mensagemDiv.textContent = mensagem;
+        mensagemDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+        `;
+
+        if (tipo === "sucesso") {
+            mensagemDiv.style.background = "linear-gradient(135deg, #00cc66, #00ff88)";
+        } else if (tipo === "erro") {
+            mensagemDiv.style.background = "linear-gradient(135deg, #ff4444, #ff6666)";
+        } else {
+            mensagemDiv.style.background = "linear-gradient(135deg, #e60073, #ff1493)";
+        }
+
+        document.body.appendChild(mensagemDiv);
+
+        setTimeout(() => {
+            mensagemDiv.style.animation = "slideOut 0.3s ease";
+            setTimeout(() => {
+                if (mensagemDiv.parentNode) {
+                    mensagemDiv.parentNode.removeChild(mensagemDiv);
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    // Adicionar estilos CSS para animações
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        .mensagem-flutuante {
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 0, 20, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(230, 0, 115, 0.3);
+            border-top: 5px solid #e60073;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // ==========================
+    // INICIALIZAÇÃO ADICIONAL
+    // ==========================
+
+    // Prevenir envio duplo de formulários
+    document.addEventListener('DOMContentLoaded', function() {
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    setTimeout(() => {
+                        submitBtn.disabled = false;
+                    }, 3000);
+                }
+            });
+        });
     });
-  });
 
-  // ==========================
-  // BOTÕES DO MODAL
-  // ==========================
-function atualizarListenersModal() {
-  // Clona os botões para remover listeners antigos
-  const novoBtnFavoritar = btnFavoritarModal.cloneNode(true);
-  const novoBtnSalvar = btnSalvarModal.cloneNode(true);
-
-  // Substitui no DOM
-  btnFavoritarModal.replaceWith(novoBtnFavoritar);
-  btnSalvarModal.replaceWith(novoBtnSalvar);
-
-  // Atualiza as referências globais
-  window.btnFavoritarModal = novoBtnFavoritar;
-  window.btnSalvarModal = novoBtnSalvar;
-
-  // Adiciona listeners novos e limpos
-  novoBtnFavoritar.addEventListener("click", (e) => {
-    e.stopPropagation();
-    favoritarFilme(novoBtnFavoritar);
-  });
-
-  novoBtnSalvar.addEventListener("click", (e) => {
-    e.stopPropagation();
-    salvarFilme(novoBtnSalvar);
-  });
-}
-
-// Chamar sempre que abrir o modal
-document.querySelectorAll(".card").forEach(card => {
-  card.addEventListener("click", async (e) => {
-    if (e.target.closest(".btn-favoritar") || e.target.closest(".btn-salvar")) return;
-
-    const imdbId = card.querySelector(".btn-favoritar")?.dataset.id;
-    if (!imdbId) return;
-
-    try {
-      const resposta = await fetch(`/detalhes/${imdbId}`);
-      const filme = await resposta.json();
-
-      poster.src = filme.imagem || card.querySelector("img").src;
-      titulo.textContent = filme.titulo || "Título não disponível";
-      descricao.textContent = filme.descricao || "Descrição não disponível.";
-      nota.textContent = filme.nota || "—";
-
-      [btnFavoritarModal, btnSalvarModal].forEach(btn => {
-        btn.dataset.id = imdbId;
-        btn.dataset.titulo = filme.titulo;
-        btn.dataset.imagem = filme.imagem;
-        btn.dataset.genero = filme.genero;
-      });
-
-      atualizarEstadoBotaoFavorito(imdbId, favoritosIds.includes(imdbId));
-      atualizarEstadoBotaoSalvar(imdbId, salvosIds.includes(imdbId));
-
-      atualizarListenersModal(); // ← 💥 Aqui é a correção principal!
-
-      modal.style.display = "flex";
-      document.body.classList.add("modal-ativo");
-    } catch (e) {
-      console.error("Erro ao buscar detalhes:", e);
-    }
-  });
-});
-
-  // Fechar modal
-  fechar.onclick = () => {
-    modal.style.display = "none";
-    document.body.classList.remove("modal-ativo");
-  };
-  modal.addEventListener("click", e => {
-    if (e.target === modal) {
-      modal.style.display = "none";
-      document.body.classList.remove("modal-ativo");
-    }
-  });
-});
-
+    // Smooth scroll para links âncora
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
 </script>
 </body>
 </html>

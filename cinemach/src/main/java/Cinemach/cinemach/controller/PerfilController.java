@@ -48,11 +48,9 @@ public class PerfilController {
             return "NAO_LOGADO";
         }
 
-
         if (titulo == null || titulo.isBlank()) titulo = "Título não disponível";
         if (imagem == null || imagem.isBlank()) imagem = "/img/placeholder.jpg";
         if (genero == null || genero.isBlank()) genero = "Desconhecido";
-
 
         Optional<FilmeSalvo> existente = filmeSalvoRepository.findByUsuarioAndImdbId(usuario, imdbId);
         if (existente.isPresent()) {
@@ -60,12 +58,10 @@ public class PerfilController {
             return "REMOVIDO";
         }
 
-
         long total = filmeSalvoRepository.countByUsuario(usuario);
         if (total >= 10) {
             return "LIMITE";
         }
-
 
         FilmeSalvo filme = new FilmeSalvo();
         filme.setImdbId(imdbId);
@@ -88,8 +84,12 @@ public class PerfilController {
             return "redirect:/login";
         }
 
-        model.addAttribute("usuario", usuario);
-        model.addAttribute("filmesSalvos", filmeSalvoRepository.findByUsuario(usuario));
+        // Recarrega o usuário do banco para ter dados atualizados
+        Usuario usuarioAtualizado = usuarioRepository.findById(usuario.getId()).orElse(usuario);
+        session.setAttribute("usuarioLogado", usuarioAtualizado);
+
+        model.addAttribute("usuario", usuarioAtualizado);
+        model.addAttribute("filmesSalvos", filmeSalvoRepository.findByUsuario(usuarioAtualizado));
 
         if (atualizado != null) {
             model.addAttribute("msg", "Perfil atualizado com sucesso!");
@@ -127,6 +127,7 @@ public class PerfilController {
                                       @RequestParam String email,
                                       @RequestParam String senhaAtual,
                                       @RequestParam(required = false) String novaSenha,
+                                      @RequestParam(required = false) String descricao, // NOVO PARÂMETRO
                                       HttpSession session) {
 
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
@@ -146,14 +147,50 @@ public class PerfilController {
         usuario.setNome(nome);
         usuario.setEmail(email);
 
+        // ATUALIZAR DESCRIÇÃO
+        if (descricao != null && descricao.length() <= 300) {
+            usuario.setDescricao(descricao);
+        } else if (descricao != null && descricao.length() > 300) {
+            return "Descrição muito longa (máximo 300 caracteres).";
+        }
+
         if (novaSenha != null && !novaSenha.isBlank()) {
             usuario.setSenha(passwordEncoder.encode(novaSenha));
         }
 
         usuarioRepository.save(usuario);
-        session.setAttribute("usuarioLogado", usuario);
+
+        // Atualiza a sessão com o usuário atualizado
+        Usuario usuarioAtualizado = usuarioRepository.findById(usuario.getId()).orElse(usuario);
+        session.setAttribute("usuarioLogado", usuarioAtualizado);
 
         return "Perfil atualizado com sucesso!";
+    }
+
+    @PostMapping("/atualizarDescricao")
+    @ResponseBody
+    public String atualizarDescricao(@RequestParam String descricao, HttpSession session) {
+        Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
+        if (usuarioLogado == null) {
+            return "ERRO_LOGIN";
+        }
+
+        if (descricao != null && descricao.length() > 300) {
+            return "LIMITE_EXCEDIDO";
+        }
+
+        try {
+            usuarioLogado.setDescricao(descricao);
+            usuarioRepository.save(usuarioLogado);
+
+            // Atualiza a sessão
+            Usuario usuarioAtualizado = usuarioRepository.findById(usuarioLogado.getId()).orElse(usuarioLogado);
+            session.setAttribute("usuarioLogado", usuarioAtualizado);
+
+            return "ATUALIZADO";
+        } catch (Exception e) {
+            return "ERRO";
+        }
     }
 
     @GetMapping("/salvos/ids")
@@ -193,10 +230,7 @@ public class PerfilController {
         usuario.setFotoPerfil(foto);
         usuarioRepository.save(usuario);
 
-
         Usuario usuarioAtualizado = usuarioRepository.findById(usuario.getId()).orElse(usuario);
-
-
         session.setAttribute("usuarioLogado", usuarioAtualizado);
 
         return "OK";

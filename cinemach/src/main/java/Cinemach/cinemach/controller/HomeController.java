@@ -67,15 +67,13 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model, HttpSession session) {
-
         List<Filme> filmesCache = (List<Filme>) session.getAttribute("filmesCache");
 
         if (filmesCache == null || filmesCache.isEmpty()) {
-
             filmesCache = imdbService.buscarFilmesAleatorios();
             session.setAttribute("filmesCache", filmesCache);
+            session.setAttribute("offsetAtual", 27); // Inicializa o offset
         }
-
 
         int fim = Math.min(27, filmesCache.size());
         List<Filme> filmesPagina = filmesCache.subList(0, fim);
@@ -87,7 +85,6 @@ public class HomeController {
 
         return "home";
     }
-
 
     @GetMapping("/pesquisa")
     public String pesquisa(@RequestParam(required = false) String q,
@@ -121,30 +118,39 @@ public class HomeController {
     @GetMapping("/filmes/mais")
     @ResponseBody
     public List<Filme> carregarMaisFilmes(HttpSession session) {
-
         List<Filme> filmesCache = (List<Filme>) session.getAttribute("filmesCache");
 
-
         if (filmesCache == null) {
-            filmesCache = new ArrayList<>();
+            return new ArrayList<>();
         }
 
+        // Obtém o offset atual da sessão
+        Integer offsetAtual = (Integer) session.getAttribute("offsetAtual");
+        if (offsetAtual == null) {
+            offsetAtual = 27;
+        }
 
-        List<Filme> novos = imdbService.buscarFilmesAleatorios();
+        // Calcula o próximo lote
+        int inicio = offsetAtual;
+        int fim = Math.min(offsetAtual + 27, filmesCache.size());
 
+        if (inicio >= filmesCache.size()) {
+            return new ArrayList<>(); // Não há mais filmes
+        }
 
-        Set<String> idsExistentes = filmesCache.stream()
-                .map(Filme::getImdbId)
-                .collect(Collectors.toSet());
+        List<Filme> novosFilmes = filmesCache.subList(inicio, fim);
 
-        List<Filme> novosUnicos = novos.stream()
-                .filter(f -> !idsExistentes.contains(f.getImdbId()))
-                .collect(Collectors.toList());
+        // Atualiza o offset na sessão
+        session.setAttribute("offsetAtual", fim);
 
+        return novosFilmes;
+    }
 
-        filmesCache.addAll(novosUnicos);
-        session.setAttribute("filmesCache", filmesCache);
-
-        return novosUnicos.stream().limit(27).collect(Collectors.toList());
+    // Endpoint para resetar o cache (opcional)
+    @GetMapping("/filmes/reset")
+    public String resetarCache(HttpSession session) {
+        session.removeAttribute("filmesCache");
+        session.removeAttribute("offsetAtual");
+        return "redirect:/";
     }
 }

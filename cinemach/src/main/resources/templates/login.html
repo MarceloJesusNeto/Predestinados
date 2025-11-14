@@ -17,29 +17,6 @@
     }
 
     .logo-btn {
-      width: 150px; /* tamanho da logo */
-      height: auto;
-      cursor: pointer;
-      background: none;
-      border: none;
-      box-shadow: none;
-      transition: transform 0.2s ease, opacity 0.2s ease;
-    }
-
-    /* Efeito suave quando o mouse passa por cima */
-    .logo-btn:hover {
-      transform: scale(1.05);
-      opacity: 0.9;
-    }
-    /* ===== LOGO DO CINEMATCH ===== */
-    .logo-link {
-      position: absolute;
-      top: 20px;
-      left: 30px;
-      z-index: 10;
-    }
-
-    .logo-btn {
       width: 80px;
       height: auto;
       cursor: pointer;
@@ -49,13 +26,28 @@
       transition: transform 0.4s ease, filter 0.4s ease;
     }
 
-    /* Efeito de hover com brilho e leve aumento */
     .logo-btn:hover {
       transform: scale(1.08);
       filter: drop-shadow(0 0 10px #ff4df5) brightness(1.3);
     }
 
+    /* Novo estilo para o link de esqueci senha */
+    .forgot-password {
+        text-align: center;
+        margin: 15px 0;
+    }
 
+    .forgot-password a {
+        color: #7B3FFF;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
+    }
+
+    .forgot-password a:hover {
+        color: #ff5fa0;
+        text-decoration: underline;
+    }
 </style>
 <body>
 
@@ -75,11 +67,8 @@
     <div class="login-box">
         <h2>Entrar</h2>
 
-
         <form action="/login" method="post" autocomplete="on">
-
             <div class="input-group">
-
                 <input
                         type="email"
                         id="email"
@@ -91,7 +80,6 @@
             </div>
 
             <div class="input-group">
-
                 <input
                         type="password"
                         id="senha"
@@ -103,6 +91,11 @@
             </div>
 
             <button type="submit">Entrar</button>
+
+            <!-- Link Esqueci minha senha -->
+            <div class="forgot-password">
+                <a href="/esqueci-senha">Esqueci minha senha</a>
+            </div>
 
             <p th:if="${erro}" style="color: red; margin-top: 10px;" th:text="${erro}"></p>
         </form>
