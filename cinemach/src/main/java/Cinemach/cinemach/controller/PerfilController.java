@@ -84,7 +84,7 @@ public class PerfilController {
             return "redirect:/login";
         }
 
-        // Recarrega o usuário do banco para ter dados atualizados
+
         Usuario usuarioAtualizado = usuarioRepository.findById(usuario.getId()).orElse(usuario);
         session.setAttribute("usuarioLogado", usuarioAtualizado);
 
@@ -116,7 +116,7 @@ public class PerfilController {
             filmeSalvoRepository.delete(existente.get());
             return ResponseEntity.ok("REMOVIDO");
         } catch (Exception e) {
-            e.printStackTrace(); // debug
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("ERRO_SERVIDOR");
         }
     }
@@ -127,7 +127,7 @@ public class PerfilController {
                                       @RequestParam String email,
                                       @RequestParam String senhaAtual,
                                       @RequestParam(required = false) String novaSenha,
-                                      @RequestParam(required = false) String descricao, // NOVO PARÂMETRO
+                                      @RequestParam(required = false) String descricao,
                                       HttpSession session) {
 
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
@@ -147,7 +147,7 @@ public class PerfilController {
         usuario.setNome(nome);
         usuario.setEmail(email);
 
-        // ATUALIZAR DESCRIÇÃO
+
         if (descricao != null && descricao.length() <= 300) {
             usuario.setDescricao(descricao);
         } else if (descricao != null && descricao.length() > 300) {
@@ -160,7 +160,7 @@ public class PerfilController {
 
         usuarioRepository.save(usuario);
 
-        // Atualiza a sessão com o usuário atualizado
+
         Usuario usuarioAtualizado = usuarioRepository.findById(usuario.getId()).orElse(usuario);
         session.setAttribute("usuarioLogado", usuarioAtualizado);
 
@@ -183,7 +183,7 @@ public class PerfilController {
             usuarioLogado.setDescricao(descricao);
             usuarioRepository.save(usuarioLogado);
 
-            // Atualiza a sessão
+
             Usuario usuarioAtualizado = usuarioRepository.findById(usuarioLogado.getId()).orElse(usuarioLogado);
             session.setAttribute("usuarioLogado", usuarioAtualizado);
 

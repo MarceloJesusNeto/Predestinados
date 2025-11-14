@@ -39,7 +39,7 @@ import java.util.Optional;
                 return "redirect:/chat";
             }
 
-            // Buscar solicitação ACEITA entre os usuários
+
             Optional<Solicitacao> solicitacaoOpt = solicitacaoRepository.findChatAtivoEntreUsuarios(usuarioLogado, destinatario);
 
             if (solicitacaoOpt.isPresent()) {

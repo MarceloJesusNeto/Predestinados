@@ -72,7 +72,7 @@ public class HomeController {
         if (filmesCache == null || filmesCache.isEmpty()) {
             filmesCache = imdbService.buscarFilmesAleatorios();
             session.setAttribute("filmesCache", filmesCache);
-            session.setAttribute("offsetAtual", 27); // Inicializa o offset
+            session.setAttribute("offsetAtual", 27);
         }
 
         int fim = Math.min(27, filmesCache.size());
@@ -124,29 +124,28 @@ public class HomeController {
             return new ArrayList<>();
         }
 
-        // Obtém o offset atual da sessão
         Integer offsetAtual = (Integer) session.getAttribute("offsetAtual");
         if (offsetAtual == null) {
             offsetAtual = 27;
         }
 
-        // Calcula o próximo lote
+
         int inicio = offsetAtual;
         int fim = Math.min(offsetAtual + 27, filmesCache.size());
 
         if (inicio >= filmesCache.size()) {
-            return new ArrayList<>(); // Não há mais filmes
+            return new ArrayList<>();
         }
 
         List<Filme> novosFilmes = filmesCache.subList(inicio, fim);
 
-        // Atualiza o offset na sessão
+
         session.setAttribute("offsetAtual", fim);
 
         return novosFilmes;
     }
 
-    // Endpoint para resetar o cache (opcional)
+
     @GetMapping("/filmes/reset")
     public String resetarCache(HttpSession session) {
         session.removeAttribute("filmesCache");

@@ -16,7 +16,7 @@ public class SugestaoBloqueada {
     @ManyToOne
     private Usuario bloqueado;
 
-    private LocalDateTime expiracao; // data em que volta a aparecer
+    private LocalDateTime expiracao;
 
     public SugestaoBloqueada() {}
 

@@ -47,7 +47,7 @@ public class AuthController {
 
         session.setAttribute("usuarioLogado", usuario);
 
-        // Cookies opcionais (pra lembrar usuário)
+
         Cookie id = new Cookie("usuarioId", usuario.getId().toString());
         Cookie nome = new Cookie("nomeUsuario", usuario.getNome());
         id.setPath("/");
@@ -64,7 +64,7 @@ public class AuthController {
     public String logout(HttpSession session, HttpServletResponse response) {
         session.invalidate();
 
-        // Limpa cookies
+
         Cookie id = new Cookie("usuarioId", "");
         id.setMaxAge(0);
         id.setPath("/");
@@ -87,12 +87,12 @@ public class AuthController {
             return "esqueci-senha";
         }
 
-        // Gera token
+
         String token = UUID.randomUUID().toString().substring(0, 8);
         tokens.put(token, email);
 
         try {
-            // ENVIA O TOKEN POR EMAIL
+
             emailService.enviarTokenRedefinicao(email, token);
 
             model.addAttribute("sucesso",
@@ -132,7 +132,7 @@ public class AuthController {
         if (usuario != null) {
             usuario.setSenha(passwordEncoder.encode(novaSenha));
             usuarioRepository.save(usuario);
-            tokens.remove(token); // Remove o token usado
+            tokens.remove(token); // Remove o token usado do ultimo usuario
 
             return "redirect:/login?sucesso=Senha alterada com sucesso!";
         }
